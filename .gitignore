@@ -9,3 +9,6 @@ VisionMethodRecord/x64/
 /.vs
 *.vcxproj
 *.filters
+*.bmp
+*.jpg
+
