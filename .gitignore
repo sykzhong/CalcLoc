@@ -1,0 +1,11 @@
+VisionMethodRecord/x64/
+*.sln
+*.db
+*.opendb
+/ipch
+/x64
+.vcxproj
+.filters
+/.vs
+*.vcxproj
+*.filters
