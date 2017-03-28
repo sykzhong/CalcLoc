@@ -1,19 +1,11 @@
 #ifndef _HSVHIST_H_
 #define _HSVHIST_H_
-#include "opencv2/highgui/highgui.hpp"
-#include "opencv2/imgproc/imgproc.hpp"
-#include <opencv2/core/core.hpp>
-#include <vector>
-#include <iostream>  
-#include <stdio.h>
+#include "GlobalHeader.h"
+
 using namespace std;
 using namespace cv;
 
-const Scalar RED = Scalar(0, 0, 255);
-const Scalar PINK = Scalar(230, 130, 255);
-const Scalar BLUE = Scalar(255, 0, 0);
-const Scalar LIGHTBLUE = Scalar(255, 255, 160);
-const Scalar GREEN = Scalar(0, 255, 0);
+
 
 class HSVHist
 {

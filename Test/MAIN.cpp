@@ -5,7 +5,7 @@
 #include <fstream>
 #include <stdio.h>
 #include <time.h>
-#define TEST2
+#define TEST3
 int main()
 {
 #ifdef SINGLE
@@ -147,6 +147,26 @@ int main()
 
 	waitKey(0);
 	return 0;
+#elif defined TEST3
+	string strfore = "4.bmp", strback = "1.bmp";
+	ProImage src, back;
+	src.getImage(strfore);
+	back.getImage(strback);
+	HSVHist::removeBack(src, back);
+
+	src.preproImage();
+	src.getContour();
+	string winname = "test";
+	src.setImageWin(winname);
+	src.initWin();
+	setMouseCallback(winname, ProImage::onMouseHandle, (void*)&src);
+
+	//string winname = "test";
+	//src.setImageWin(winname);
+	//src.showImage();
+
+	waitKey(0);
+return 0;
 #endif
 	
 }

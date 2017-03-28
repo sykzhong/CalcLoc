@@ -55,9 +55,19 @@ void ProImage::getContour()
 			i--;
 		}
 	sort(veccon.begin(), veccon.end(), ProImage::compArea);
+	
+	////////使用ImageCon存储轮廓信息/////////
+	vecImageCon.resize(veccon.size());
+	for (int i = 0; i < vecImageCon.size(); i++)
+	{
+		vecImageCon[i].inputCon(veccon[i], i + 1, RED, 8, 2);
+		vecImageCon[i].cvtCon2Mat(srcimage);
+	}
+	////////////////////////////////////////
+
 	r_orgcon.resize(veccon.size());
 	b_orgcon.resize(veccon.size());
-	////////////////在conindex中记录轮廓坐标及索引值
+	//////在conindex中记录轮廓坐标及索引值
 	for (int i = 0; i < veccon.size(); i++)
 	{
 		drawContours(conindex, veccon, i, Scalar(i + 1), 5);
@@ -87,18 +97,29 @@ void ProImage::setImageWin(const string &_winname)
 	winname = _winname;
 	
 	chosen.clear();
-	//////初始化界面图像，将所有轮廓标红////////
-	m_showimage = srcimage.clone();
-	for (int i = 0; i < veccon.size(); i++)
-		coverImage(m_showimage, r_orgcon[i]);
 	reset();
+	//////初始化界面图像，将所有轮廓标红////////
+	//m_showimage = srcimage.clone();
+	//for (int i = 0; i < veccon.size(); i++)
+	//	coverImage(m_showimage, r_orgcon[i]);
+	//reset();
 	namedWindow(winname, WINDOW_AUTOSIZE);
 	///////////////////////////////////////
 }
 
+void ProImage::initWin()
+{
+	m_showimage = srcimage.clone();
+	for (int i = 0; i < vecImageCon.size(); i++)
+		coverImage(m_showimage, vecImageCon[i].show_image);
+	reset();
+	//m_showimage = vecImageCon[0].show_image.clone();
+	imshow(winname, m_showimage);
+}
+
 void ProImage::coverImage(Mat &dst, Mat &img)			//原图像dst上覆盖img
 {
-	CV_Assert(dst.size() == img.size());
+	CV_Assert(dst.size() == img.size() && dst.channels() == img.channels());
 	int nChannels = img.channels();
 	int nRows = img.rows;
 	int nCols = img.cols;
@@ -143,6 +164,93 @@ void ProImage::showImage()
 	imshow(winname, m_showimage);
 }
 
+void ProImage::highlightImage(const int &_selectindex)
+{
+	ImageCon &src = vecImageCon[_selectindex];
+	drawContours(m_showimage, vector<vector<Point>>(1, src.contour), -1, src.color, src.thicklinesize);
+	imshow(winname, m_showimage);
+	//Mat &img = vecImageCon[_selectindex].value_image;		//单通道
+	//Mat &dst = m_showimage;									//三通道
+	//CV_Assert(dst.size() == img.size() && dst.channels() == 3 && img.channels() == 1);
+	//int pChannels = img.channels();
+	//int qChannels = dst.channels();
+	//int nRows = img.rows;
+	//int nCols = img.cols;
+	//if (img.isContinuous() && dst.isContinuous())
+	//{
+	//	nCols *= nRows;
+	//	nRows = 1;
+	//}
+	//uchar* p;			//记录覆盖在上的图像行指针
+	//uchar* q;			//记录被覆盖的图像行指针
+	//for (int i = 0; i < nRows; i++)
+	//	for (int j = 0; j < nCols; j++)
+	//	{
+	//		p = img.ptr<uchar>(i);
+	//		q = dst.ptr<uchar>(i);
+	//		if (p[j*pChannels] != 0)
+	//		{
+	//			for (int k = 0; k < qChannels; k++)
+	//				q[j*qChannels + k] = vecImageCon[_selectindex].color[k];
+
+	//		}
+	//	}
+	//imshow(winname, dst);
+}
+
+void ProImage::lowlightImage(const int &_selectindex)
+{
+	Mat &img1 = vecImageCon[_selectindex].show_image;
+	Mat &img2 = srcimage;
+	Mat &mask = vecImageCon[_selectindex].value_image;
+	Mat &dst = m_showimage;
+	CV_Assert(dst.size() == img1.size() && dst.channels() == 3 && 
+		mask.channels() == 1 && img1.channels() == 3 && img2.channels() == 3);
+	int pChannels = mask.channels();		//mask的通道数，单通道
+	int qChannels = dst.channels();			//img1, img2与dst的通道数，三通道
+	int nRows = img1.rows;
+	int nCols = img1.cols;
+	if (img1.isContinuous() && img2.isContinuous() && dst.isContinuous() && mask.isContinuous())
+	{
+		nCols *= nRows;
+		nRows = 1;
+	}
+	uchar* p_img1;			//img1行指针
+	uchar* p_img2;
+	uchar* p_dst;
+	uchar* p_mask;
+	for (int i = 0; i < nRows; i++)
+		for (int j = 0; j < nCols; j++)
+		{
+			p_img1 = img1.ptr<uchar>(i);
+			p_img2 = img2.ptr<uchar>(i);
+			p_dst = dst.ptr<uchar>(i);
+			p_mask = mask.ptr<uchar>(i);
+			if (p_mask[j*pChannels] != 0)
+			{
+				int k;
+				for (k = 0; k < qChannels; k++)
+				{
+					if (p_img1[j*qChannels + k] != 0)
+						break;
+				}
+				if (k >= qChannels)				//说明该点不在show image上，恢复为srcimage
+				{
+					for (k = 0; k < qChannels; k++)
+						p_dst[j*qChannels + k] = p_img2[j*qChannels + k];
+				}
+				else							//在show image的范围内，恢复为color
+				{
+					for (k = 0; k < qChannels; k++)
+						p_dst[j*qChannels + k] = vecImageCon[_selectindex].color[k];
+				}
+			}
+		}
+	imshow(winname, dst);
+}
+
+
+
 void ProImage::fitContour()
 {
 	vecpoly.resize(chosen.size());					//chosen的轮廓数为多边形拟合数目，vecpoly用于存储多边形拟合结果
@@ -183,37 +291,80 @@ int ProImage::compArea(vector<Point> first, vector<Point> second)
 	return contourArea(first) > contourArea(second);
 }
 
+
+/////////////////旧的使用红蓝contour的mousehandle
+//void ProImage::onMouseHandle(int event, int x, int y, int flags, void* param)
+//{
+//	ProImage& proimage = *(ProImage*)param;
+//	int index = (int)proimage.conindex.at<uchar>(y, x) - 1;		//轮廓索引值，负值表示无轮廓
+//	switch (event)
+//	{
+//	case CV_EVENT_LBUTTONDOWN:
+//		if (index >= 0)
+//		{
+//			if (proimage.chosen.find(index) != proimage.chosen.end())
+//				proimage.chosen.erase(index);
+//			else
+//				proimage.chosen.insert(index);
+//			proimage.showImage();
+//		}
+//	case CV_EVENT_MOUSEMOVE:
+//		if (index >= 0)
+//		{
+//			if (proimage.selectindex == -1)
+//			{
+//				proimage.selectindex = index;
+//				proimage.recoverflag = 0;
+//				proimage.showImage();
+//			}
+//		}
+//		else
+//		{
+//			if (proimage.selectindex != -1)
+//			{
+//				proimage.recoverflag = 1;
+//				proimage.showImage();
+//				proimage.selectindex = -1;
+//			}
+//		}
+//		break;
+//	}
+//}
+
 void ProImage::onMouseHandle(int event, int x, int y, int flags, void* param)
 {
 	ProImage& proimage = *(ProImage*)param;
-	int index = (int)proimage.conindex.at<uchar>(y, x) - 1;		//轮廓索引值，负值表示无轮廓
+	int index = 0;							//轮廓索引值，正值表示存在轮廓
+	for (int i = 0; i < proimage.vecImageCon.size(); i++)
+	{
+		if (proimage.vecImageCon[i].value_image.at<uchar>(y, x) != 0)
+		{
+			index = proimage.vecImageCon[i].value_image.at<uchar>(y, x);
+			break;
+		}
+	}
 	switch (event)
 	{
-	case CV_EVENT_LBUTTONDOWN:
-		if (index >= 0)
-		{
-			if (proimage.chosen.find(index) != proimage.chosen.end())
-				proimage.chosen.erase(index);
-			else
-				proimage.chosen.insert(index);
-			proimage.showImage();
-		}
+	//case CV_EVENT_LBUTTONDOWN:
+	//	if (index >= 0)
+	//	{
+	//		if (proimage.chosen.find(index) != proimage.chosen.end())
+	//			proimage.chosen.erase(index);
+	//		else
+	//			proimage.chosen.insert(index);
+	//		proimage.showImage();
+	//	}
 	case CV_EVENT_MOUSEMOVE:
-		if (index >= 0)
+		if (index > 0)
 		{
-			if (proimage.selectindex == -1)
-			{
-				proimage.selectindex = index;
-				proimage.recoverflag = 0;
-				proimage.showImage();
-			}
+			proimage.highlightImage(index - 1);
+			proimage.selectindex = index;
 		}
 		else
 		{
 			if (proimage.selectindex != -1)
 			{
-				proimage.recoverflag = 1;
-				proimage.showImage();
+				proimage.lowlightImage(proimage.selectindex - 1);
 				proimage.selectindex = -1;
 			}
 		}
