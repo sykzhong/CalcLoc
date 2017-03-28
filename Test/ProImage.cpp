@@ -27,19 +27,19 @@ void ProImage::preproImage()
 {
 	medianBlur(m_image, m_image, 5);
 
-	int morph_elem = 0;		//Element:\n 0: Rect - 1: Cross - 2: Ellipse
-	int morph_size = 5;
-	Mat element = getStructuringElement(morph_elem, Size(2 * morph_size + 1, 2 * morph_size + 1), Point(morph_size, morph_size));
+	//int morph_elem = 0;		//Element:\n 0: Rect - 1: Cross - 2: Ellipse
+	//int morph_size = 5;
+	//Mat element = getStructuringElement(morph_elem, Size(2 * morph_size + 1, 2 * morph_size + 1), Point(morph_size, morph_size));
 	//dilate(m_image, m_image, element, Point(-1, -1), 1);
 	//erode(m_image, m_image, element, Point(-1, -1), 1);
 	
 	//morphologyEx(m_image, m_image, MORPH_OPEN, element);
-	imshow("Proimage", m_image);
+	//imshow("Proimage", m_image);
 }
 
 void ProImage::getContour()
 {
-	this->preproImage();
+	this->preproImage();			//预处理
 	Mat conimage;
 	cvtColor(m_image, conimage, CV_BGR2GRAY);
 	conindex = Mat(m_image.rows, m_image.cols, CV_8UC1, Scalar::all(0));
@@ -47,7 +47,8 @@ void ProImage::getContour()
 		CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0));
 
 	vector<int> index;
-	for (int i = 0; i < veccon.size(); i++)
+
+	for (int i = 0; i < veccon.size(); i++)		//去除细小轮廓
 		if (contourArea(veccon[i]) < m_image.cols*m_image.rows / 50)
 		{
 			veccon.erase(veccon.begin() + i);
@@ -60,16 +61,21 @@ void ProImage::getContour()
 	for (int i = 0; i < veccon.size(); i++)
 	{
 		drawContours(conindex, veccon, i, Scalar(i + 1), 5);
+		///////////////绘制保存红蓝轮廓
 		r_orgcon[i] = Mat(m_image.size(), CV_8UC3, Scalar::all(0));
 		b_orgcon[i] = Mat(m_image.size(), CV_8UC3, Scalar::all(0));
 		drawContours(r_orgcon[i], veccon, i, RED, 2);
 		drawContours(b_orgcon[i], veccon, i, BLUE, 2);
-		Mat tmpimg = Mat(m_image.size(), CV_8UC1, Scalar::all(0));;
-		drawContours(tmpimg, veccon, i, Scalar::all(255), 1);
-		string strtmpimg = "tmpimg";
-		strtmpimg += 'a' + i;
-		strtmpimg += ".jpg";
-		imwrite(strtmpimg, tmpimg);
+		//////////////////////////////
+
+		///////////////////试验用存图
+		//Mat tmpimg = Mat(m_image.size(), CV_8UC1, Scalar::all(0));;
+		//drawContours(tmpimg, veccon, i, Scalar::all(255), 1);
+		//string strtmpimg = "tmpimg";
+		//strtmpimg += 'a' + i;
+		//strtmpimg += ".jpg";
+		//imwrite(strtmpimg, tmpimg);
+		/////////////////////////////
 	}
 
 }
@@ -81,7 +87,7 @@ void ProImage::setImageWin(const string &_winname)
 	winname = _winname;
 	
 	chosen.clear();
-	//////初始化界面图像，将轮廓标红////////
+	//////初始化界面图像，将所有轮廓标红////////
 	m_showimage = srcimage.clone();
 	for (int i = 0; i < veccon.size(); i++)
 		coverImage(m_showimage, r_orgcon[i]);
@@ -90,7 +96,7 @@ void ProImage::setImageWin(const string &_winname)
 	///////////////////////////////////////
 }
 
-void ProImage::coverImage(Mat &dst, Mat &img)
+void ProImage::coverImage(Mat &dst, Mat &img)			//原图像dst上覆盖img
 {
 	CV_Assert(dst.size() == img.size());
 	int nChannels = img.channels();
@@ -120,13 +126,13 @@ void ProImage::coverImage(Mat &dst, Mat &img)
 
 void ProImage::showImage()
 {
-	vector<Mat>::iterator iter;
+	vector<Mat>::iterator iter;						//指定特定轮廓容器的迭代器
 	if (recoverflag == 1)							//轮廓由蓝色（高亮）变为红色（普通）
 		iter = r_orgcon.begin();
 	else if(recoverflag == 0)
 		iter = b_orgcon.begin();
 	
-	if (recoverflag = 1 && 
+	if (recoverflag == 1 && 
 		chosen.find(selectindex) != chosen.end())	//防止鼠标滑动过程将已选定轮廓复原为红色
 		return;
 
@@ -139,7 +145,7 @@ void ProImage::showImage()
 
 void ProImage::fitContour()
 {
-	vecpoly.resize(chosen.size());
+	vecpoly.resize(chosen.size());					//chosen的轮廓数为多边形拟合数目，vecpoly用于存储多边形拟合结果
 	vececllipse.resize(veccon.size() - vecpoly.size());
 	int j = 0, k = 0;
 	for (int i = 0; i < veccon.size(); i++)
@@ -153,13 +159,13 @@ void ProImage::fitContour()
 		{
 			Mat pointsf;
 			Mat(veccon[i]).convertTo(pointsf, CV_32F);
-			vececllipse[k] = fitEllipse(pointsf);
+			vececllipse[k] = fitEllipse(pointsf);	//vecellipse用于存储椭圆拟合结果
 			k++;
 		}
 	}
 }
 
-void ProImage::writeResult(string _imgname)
+void ProImage::writeResult(string _imgname)		//记录完整的处理结果
 {
 	Mat result = srcimage.clone();
 	for (int i = 0; i < vecpoly.size(); i++)
@@ -215,14 +221,14 @@ void ProImage::onMouseHandle(int event, int x, int y, int flags, void* param)
 	}
 }
 
-void ProImage::getData(ProImage Temp)
+void ProImage::getData(ProImage Temp)		//ProImage类之间传递被选轮廓的index
 {
 	set<int>::iterator iter;
 	for (iter = Temp.chosen.begin(); iter != Temp.chosen.end(); iter++)
 		chosen.insert(*iter);
 }
 
-void ProImage::printContour()
+void ProImage::printContour()			//提取实验用图的代码
 {
 	ofstream fresult;
 	fresult.open("contour.txt", ios::in | ios::ate);
