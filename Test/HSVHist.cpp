@@ -114,7 +114,7 @@ void HSVHist::showImage(string strpath)
 		strpath = this->path;
 	strpath += "hist";
 	imshow(strpath, m_image);
-	//imwrite("result.jpg", m_image);
+	imwrite("houghtest.jpg", m_image);
 }
 
 void HSVHist::removeBack(HSVHist dst, HSVHist back)

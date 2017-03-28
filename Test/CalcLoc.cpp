@@ -12,14 +12,37 @@ CalcLoc::~CalcLoc()
 
 void CalcLoc::getHUMoment()
 {
-	vecmu.resize(vecpoly.size());
-	for (int i = 0; i < vecmu.size(); i++)
-		vecmu[i] = moments(vecpoly[i], false);
+	Moments tmpmoment;
+	for (int i = 0; i < vecImageCon.size(); i++)
+	{
+		if (vecImageCon[i].flag == CON_POLY)
+		{
+			tmpmoment = moments(vecImageCon[i].polycontour, false);
+			vecmu.push_back(tmpmoment);
+		}
+	}
+	//vecmu.resize(vecpoly.size());
+	//for (int i = 0; i < vecmu.size(); i++)
+	//	vecmu[i] = moments(vecpoly[i], false);
 }
 
 void CalcLoc::getCenter()
 {
 	this->getHUMoment();
+	for (int i = 0; i < vecImageCon.size(); i++)
+		if (vecImageCon[i].flag == CON_ELLIPSE)
+		{
+			m_Ecenter.push_back(vecImageCon[i].ellipsebox.center);
+			m_center += m_Pcenter[i];
+		}
+	for (int i = 0; i < vecmu.size(); i++)
+	{
+		m_Pcenter.push_back(Point2f(vecmu[i].m10 / vecmu[i].m00, vecmu[i].m01 / vecmu[i].m00));
+		m_center += m_Pcenter[i];
+	}
+	m_center /= (float)(m_Pcenter.size() + m_Ecenter.size());
+
+	/*this->getHUMoment();
 	m_Pcenter.resize(vecpoly.size());
 	m_Ecenter.resize(vececllipse.size());
 	m_center = Point2f(0, 0);
@@ -33,7 +56,7 @@ void CalcLoc::getCenter()
 		m_Ecenter[i] = vececllipse[i].center;
 		m_center += m_Ecenter[i];
 	}
-	m_center /= (float)(m_Pcenter.size() + m_Ecenter.size());
+	m_center /= (float)(m_Pcenter.size() + m_Ecenter.size());*/
 }
 
 void CalcLoc::printResult(CalcLoc &dst)

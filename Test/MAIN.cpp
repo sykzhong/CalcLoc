@@ -148,11 +148,12 @@ int main()
 	waitKey(0);
 	return 0;
 #elif defined TEST3
-	string strfore = "4.bmp", strback = "1.bmp";
+	string strfore = "3.bmp", strback = "1.bmp";
 	ProImage src, back;
 	src.getImage(strfore);
 	back.getImage(strback);
 	HSVHist::removeBack(src, back);
+	//src.HSVHist::showImage();
 
 	src.preproImage();
 	src.getContour();
@@ -160,6 +161,21 @@ int main()
 	src.setImageWin(winname);
 	src.initWin();
 	setMouseCallback(winname, ProImage::onMouseHandle, (void*)&src);
+
+	for (int endsign = 0; endsign != 1; )
+	{
+		int c = waitKey(0);
+		switch ((char)c)
+		{
+		case 'f':
+			endsign = 1;
+			src.fitContour();
+			src.writeResult();
+			break;
+		case 'r':
+			src.reset();
+		}
+	}
 
 	//string winname = "test";
 	//src.setImageWin(winname);

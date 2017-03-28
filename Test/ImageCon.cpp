@@ -1,10 +1,13 @@
 #include "stdafx.h"
 #include "ImageCon.h"
 
-void ImageCon::inputCon(vector<Point> &_contour, const int &_value, const Scalar &_color, const int &_thicklinesize, const int &_thinlinesize)
+const Scalar ImageCon::g_color[4] = { WHITE, RED, BLUE, GREEN };
+
+void ImageCon::inputCon(vector<Point> &_contour, const int &_value, const int &_flag, const int &_thicklinesize, const int &_thinlinesize)
 {
 	contour.resize(_contour.size());
-	color = _color;
+	flag = _flag;
+	color = g_color[flag];
 	thicklinesize = _thicklinesize;
 	value = _value;
 	thinlinesize = _thinlinesize;
@@ -17,4 +20,19 @@ void ImageCon::cvtCon2Mat(const Mat &_template)
 	show_image = Mat(_template.size(), CV_8UC3, Scalar::all(0));
 	drawContours(value_image, vector<vector<Point>>(1, contour), -1, Scalar(value), thicklinesize);		//»æÖÆÂÖÀªË÷ÒýÖµÍ¼£¨¸ßÁÁ×´Ì¬´ÖÏ¸£©
 	drawContours(show_image, vector<vector<Point>>(1, contour), -1, color, thinlinesize);				//»æÖÆÂÖÀª(·Ç¸ßÁÁ×´Ì¬´ÖÏ¸)
+}
+
+void ImageCon::fitContour()
+{
+	switch (flag)
+	{
+	case CON_POLY:
+		approxPolyDP(contour, polycontour, 10, true);
+		break;
+	case CON_ELLIPSE:
+		Mat pointsf;
+		Mat(contour).convertTo(pointsf, CV_32F);
+		ellipsebox = fitEllipse(pointsf);	
+		break;
+	}
 }

@@ -19,10 +19,10 @@ public:
 
 	void getContour();										//提取图像轮廓并去除不合理轮廓
 	
-	void showImage();										//根据用户操作情况显示界面
+	//void showImage();										//根据用户操作情况显示界面
 	void coverImage(Mat &dst, Mat &img);					//对dst使用img进行覆盖
-	void highlightImage(const int &_selectindex);					//对用户选择的轮廓进行高亮显示
-	void lowlightImage(const int &_selectindex);					//对用户脱离选择的轮廓恢复低亮显示
+	void highlightImage(const int &_selectindex);			//对用户选择的轮廓进行高亮显示
+	void lowlightImage(const int &_selectindex);			//对用户脱离选择的轮廓恢复低亮显示
 	void fitContour();										//根据用户操作情况对轮廓进行重新拟合
 
 	
@@ -43,14 +43,17 @@ private:
 	string winname;						//用户操作窗口名称
 	Mat m_showimage;					//用户操作界面图像
 
-	vector<ImageCon> vecImageCon;
+	
 	vector<Mat> r_orgcon;				//分块存储原轮廓
 	vector<Mat> b_orgcon;				//分块存储原轮廓（高亮显示）
 
 	int selectindex;					//记录被选择的单个轮廓索引
 	int recoverflag;					//是否复原的标记（显示用）
-	
+
+
 protected:
+	vector<ImageCon> vecImageCon;		//存储所有轮廓信息
+
 	vector<vector<Point>> veccon;		//记录原始轮廓
 	set<int> chosen;					//记录被选择的所有轮廓索引
 	vector<vector<Point>> vecpoly;		//记录进行多边形拟合的轮廓

@@ -25,13 +25,15 @@ void ProImage::reset()
 
 void ProImage::preproImage()
 {
-	medianBlur(m_image, m_image, 5);
-
 	//int morph_elem = 0;		//Element:\n 0: Rect - 1: Cross - 2: Ellipse
-	//int morph_size = 5;
+	//int morph_size = 3;
 	//Mat element = getStructuringElement(morph_elem, Size(2 * morph_size + 1, 2 * morph_size + 1), Point(morph_size, morph_size));
 	//dilate(m_image, m_image, element, Point(-1, -1), 1);
 	//erode(m_image, m_image, element, Point(-1, -1), 1);
+
+	//medianBlur(m_image, m_image, 5);
+
+
 	
 	//morphologyEx(m_image, m_image, MORPH_OPEN, element);
 	//imshow("Proimage", m_image);
@@ -60,33 +62,33 @@ void ProImage::getContour()
 	vecImageCon.resize(veccon.size());
 	for (int i = 0; i < vecImageCon.size(); i++)
 	{
-		vecImageCon[i].inputCon(veccon[i], i + 1, RED, 8, 2);
+		vecImageCon[i].inputCon(veccon[i], i + 1, 1, 8, 2);
 		vecImageCon[i].cvtCon2Mat(srcimage);
 	}
 	////////////////////////////////////////
 
-	r_orgcon.resize(veccon.size());
-	b_orgcon.resize(veccon.size());
-	//////在conindex中记录轮廓坐标及索引值
-	for (int i = 0; i < veccon.size(); i++)
-	{
-		drawContours(conindex, veccon, i, Scalar(i + 1), 5);
-		///////////////绘制保存红蓝轮廓
-		r_orgcon[i] = Mat(m_image.size(), CV_8UC3, Scalar::all(0));
-		b_orgcon[i] = Mat(m_image.size(), CV_8UC3, Scalar::all(0));
-		drawContours(r_orgcon[i], veccon, i, RED, 2);
-		drawContours(b_orgcon[i], veccon, i, BLUE, 2);
-		//////////////////////////////
+	//r_orgcon.resize(veccon.size());
+	//b_orgcon.resize(veccon.size());
+	////////在conindex中记录轮廓坐标及索引值
+	//for (int i = 0; i < veccon.size(); i++)
+	//{
+	//	drawContours(conindex, veccon, i, Scalar(i + 1), 5);
+	//	///////////////绘制保存红蓝轮廓
+	//	r_orgcon[i] = Mat(m_image.size(), CV_8UC3, Scalar::all(0));
+	//	b_orgcon[i] = Mat(m_image.size(), CV_8UC3, Scalar::all(0));
+	//	drawContours(r_orgcon[i], veccon, i, RED, 2);
+	//	drawContours(b_orgcon[i], veccon, i, BLUE, 2);
+	//	//////////////////////////////
 
-		///////////////////试验用存图
-		//Mat tmpimg = Mat(m_image.size(), CV_8UC1, Scalar::all(0));;
-		//drawContours(tmpimg, veccon, i, Scalar::all(255), 1);
-		//string strtmpimg = "tmpimg";
-		//strtmpimg += 'a' + i;
-		//strtmpimg += ".jpg";
-		//imwrite(strtmpimg, tmpimg);
-		/////////////////////////////
-	}
+	//	///////////////////试验用存图
+	//	//Mat tmpimg = Mat(m_image.size(), CV_8UC1, Scalar::all(0));;
+	//	//drawContours(tmpimg, veccon, i, Scalar::all(255), 1);
+	//	//string strtmpimg = "tmpimg";
+	//	//strtmpimg += 'a' + i;
+	//	//strtmpimg += ".jpg";
+	//	//imwrite(strtmpimg, tmpimg);
+	//	/////////////////////////////
+	//}
 
 }
 
@@ -145,24 +147,24 @@ void ProImage::coverImage(Mat &dst, Mat &img)			//原图像dst上覆盖img
 		}
 }
 
-void ProImage::showImage()
-{
-	vector<Mat>::iterator iter;						//指定特定轮廓容器的迭代器
-	if (recoverflag == 1)							//轮廓由蓝色（高亮）变为红色（普通）
-		iter = r_orgcon.begin();
-	else if(recoverflag == 0)
-		iter = b_orgcon.begin();
-	
-	if (recoverflag == 1 && 
-		chosen.find(selectindex) != chosen.end())	//防止鼠标滑动过程将已选定轮廓复原为红色
-		return;
-
-	for (int i = 0; i < veccon.size(); i++)
-		if (i == selectindex)
-			coverImage(m_showimage, *(iter+i));
-
-	imshow(winname, m_showimage);
-}
+//void ProImage::showImage()
+//{
+//	vector<Mat>::iterator iter;						//指定特定轮廓容器的迭代器
+//	if (recoverflag == 1)							//轮廓由蓝色（高亮）变为红色（普通）
+//		iter = r_orgcon.begin();
+//	else if(recoverflag == 0)
+//		iter = b_orgcon.begin();
+//	
+//	if (recoverflag == 1 && 
+//		chosen.find(selectindex) != chosen.end())	//防止鼠标滑动过程将已选定轮廓复原为红色
+//		return;
+//
+//	for (int i = 0; i < veccon.size(); i++)
+//		if (i == selectindex)
+//			coverImage(m_showimage, *(iter+i));
+//
+//	imshow(winname, m_showimage);
+//}
 
 void ProImage::highlightImage(const int &_selectindex)
 {
@@ -249,37 +251,60 @@ void ProImage::lowlightImage(const int &_selectindex)
 	imshow(winname, dst);
 }
 
-
-
 void ProImage::fitContour()
 {
-	vecpoly.resize(chosen.size());					//chosen的轮廓数为多边形拟合数目，vecpoly用于存储多边形拟合结果
-	vececllipse.resize(veccon.size() - vecpoly.size());
-	int j = 0, k = 0;
-	for (int i = 0; i < veccon.size(); i++)
-	{
-		if (chosen.find(i) != chosen.end())
-		{
-			approxPolyDP(veccon[i], vecpoly[j], 10, true);
-			j++;
-		}
-		else
-		{
-			Mat pointsf;
-			Mat(veccon[i]).convertTo(pointsf, CV_32F);
-			vececllipse[k] = fitEllipse(pointsf);	//vecellipse用于存储椭圆拟合结果
-			k++;
-		}
-	}
+	//vecpoly.resize(chosen.size());					//chosen的轮廓数为多边形拟合数目，vecpoly用于存储多边形拟合结果
+	//vececllipse.resize(veccon.size() - vecpoly.size());
+	//int j = 0, k = 0;
+	//for (int i = 0; i < veccon.size(); i++)
+	//{
+	//	if (chosen.find(i) != chosen.end())
+	//	{
+	//		approxPolyDP(veccon[i], vecpoly[j], 10, true);
+	//		j++;
+	//	}
+	//	else
+	//	{
+	//		Mat pointsf;
+	//		Mat(veccon[i]).convertTo(pointsf, CV_32F);
+	//		vececllipse[k] = fitEllipse(pointsf);	//vecellipse用于存储椭圆拟合结果
+	//		k++;
+	//	}
+	//}
+	for (int i = 0; i < vecImageCon.size(); i++)
+		vecImageCon[i].fitContour();
 }
 
 void ProImage::writeResult(string _imgname)		//记录完整的处理结果
 {
+	//Mat result = srcimage.clone();
+	//for (int i = 0; i < vecpoly.size(); i++)
+	//	drawContours(result, vecpoly, i, RED, 2);
+	//for(int i = 0; i < vececllipse.size(); i++)
+	//	ellipse(result, vececllipse[i], RED, 2, CV_AA);
+	//if (_imgname == "")
+	//	_imgname = "result.jpg";
+	////imshow(_imgname, result);
+	//imwrite(_imgname, result);
 	Mat result = srcimage.clone();
-	for (int i = 0; i < vecpoly.size(); i++)
-		drawContours(result, vecpoly, i, RED, 2);
-	for(int i = 0; i < vececllipse.size(); i++)
-		ellipse(result, vececllipse[i], RED, 2, CV_AA);
+	for (int i = 0; i < vecImageCon.size(); i++)
+	{
+		ImageCon &src = vecImageCon[i];
+		switch (src.flag)
+		{
+		case CON_IGNORE:
+			break;
+		case CON_NORMAL:
+			drawContours(result, vector<vector<Point>>(1, src.contour), -1, src.color, src.thinlinesize);
+			break;
+		case CON_POLY:
+			drawContours(result, vector<vector<Point>>(1, src.polycontour), -1, src.color, src.thinlinesize);
+			break;
+		case CON_ELLIPSE:
+			ellipse(result, src.ellipsebox, src.color, 2, CV_AA);
+			break;
+		}
+	}
 	if (_imgname == "")
 		_imgname = "result.jpg";
 	//imshow(_imgname, result);
@@ -335,6 +360,8 @@ void ProImage::onMouseHandle(int event, int x, int y, int flags, void* param)
 {
 	ProImage& proimage = *(ProImage*)param;
 	int index = 0;							//轮廓索引值，正值表示存在轮廓
+	if (y < 0 || y >= proimage.srcimage.rows || x < 0 || x >= proimage.srcimage.cols)
+		return;
 	for (int i = 0; i < proimage.vecImageCon.size(); i++)
 	{
 		if (proimage.vecImageCon[i].value_image.at<uchar>(y, x) != 0)
@@ -345,15 +372,15 @@ void ProImage::onMouseHandle(int event, int x, int y, int flags, void* param)
 	}
 	switch (event)
 	{
-	//case CV_EVENT_LBUTTONDOWN:
-	//	if (index >= 0)
-	//	{
-	//		if (proimage.chosen.find(index) != proimage.chosen.end())
-	//			proimage.chosen.erase(index);
-	//		else
-	//			proimage.chosen.insert(index);
-	//		proimage.showImage();
-	//	}
+	case CV_EVENT_LBUTTONDOWN:		//左键单击，则对所选轮廓的颜色、状态进行相应更改
+		if (index > 0)
+		{
+			int &_flag = proimage.vecImageCon[index - 1].flag;
+			_flag++;
+			if (_flag >= sizeof(ImageCon::g_color) / sizeof(Scalar))
+				_flag = 0;
+			proimage.vecImageCon[index - 1].color = ImageCon::g_color[_flag];
+		}
 	case CV_EVENT_MOUSEMOVE:
 		if (index > 0)
 		{
