@@ -19,6 +19,7 @@ public:
 	void inputCon(vector<Point> &_contour, const int &_value, const int &_flag, const int &_thicklinesize, const int &_thinlinesize);
 	void cvtCon2Mat(const Mat &_template);		//按模板大小绘制相应轮廓
 	void fitContour();
+	void updateColor();
 	
 	vector<Point> contour;	//单个图像轮廓
 	int thicklinesize;		//当轮廓高亮状态时的粗细

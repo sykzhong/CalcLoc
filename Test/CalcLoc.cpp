@@ -29,16 +29,19 @@ void CalcLoc::getHUMoment()
 void CalcLoc::getCenter()
 {
 	this->getHUMoment();
+	m_center = Point2f(0, 0);
+	m_Ecenter.clear();
+	m_Pcenter.clear();
 	for (int i = 0; i < vecImageCon.size(); i++)
 		if (vecImageCon[i].flag == CON_ELLIPSE)
 		{
 			m_Ecenter.push_back(vecImageCon[i].ellipsebox.center);
-			m_center += m_Pcenter[i];
+			m_center += m_Ecenter.back();
 		}
 	for (int i = 0; i < vecmu.size(); i++)
 	{
 		m_Pcenter.push_back(Point2f(vecmu[i].m10 / vecmu[i].m00, vecmu[i].m01 / vecmu[i].m00));
-		m_center += m_Pcenter[i];
+		m_center += m_Pcenter.back();
 	}
 	m_center /= (float)(m_Pcenter.size() + m_Ecenter.size());
 
@@ -80,13 +83,37 @@ void CalcLoc::printResult(time_t nowtime)
 void CalcLoc::writeResult(string _imgname)
 {
 	Mat result = srcimage.clone();
-	for (int i = 0; i < vecpoly.size(); i++)
-		drawContours(result, vecpoly, i, RED, 2);
-	for (int i = 0; i < vececllipse.size(); i++)
-		ellipse(result, vececllipse[i], RED, 2, CV_AA);
+	for (int i = 0; i < vecImageCon.size(); i++)
+	{
+		ImageCon &src = vecImageCon[i];
+		switch (src.flag)
+		{
+		case CON_IGNORE:
+			break;
+		case CON_NORMAL:
+			drawContours(result, vector<vector<Point>>(1, src.contour), -1, src.color, src.thinlinesize);
+			break;
+		case CON_POLY:
+			drawContours(result, vector<vector<Point>>(1, src.polycontour), -1, src.color, src.thinlinesize);
+			break;
+		case CON_ELLIPSE:
+			ellipse(result, src.ellipsebox, src.color, 2, CV_AA);
+			break;
+		}
+	}
 	circle(result, m_center, 3, RED, -1);
 	if (_imgname == "")
 		_imgname = "result.jpg";
 	//imshow(_imgname, result);
 	imwrite(_imgname, result);
+	//Mat result = srcimage.clone();
+	//for (int i = 0; i < vecpoly.size(); i++)
+	//	drawContours(result, vecpoly, i, RED, 2);
+	//for (int i = 0; i < vececllipse.size(); i++)
+	//	ellipse(result, vececllipse[i], RED, 2, CV_AA);
+	//circle(result, m_center, 3, RED, -1);
+	//if (_imgname == "")
+	//	_imgname = "result.jpg";
+	////imshow(_imgname, result);
+	//imwrite(_imgname, result);
 }

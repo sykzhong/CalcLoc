@@ -12,9 +12,10 @@ ProImage::~ProImage()
 
 void ProImage::Init()
 {
-	veccon.clear();
-	chosen.clear();
-	reset();
+	//veccon.clear();
+	//chosen.clear();
+	vecImageCon.clear();
+	//reset();
 }
 
 void ProImage::reset()
@@ -379,7 +380,7 @@ void ProImage::onMouseHandle(int event, int x, int y, int flags, void* param)
 			_flag++;
 			if (_flag >= sizeof(ImageCon::g_color) / sizeof(Scalar))
 				_flag = 0;
-			proimage.vecImageCon[index - 1].color = ImageCon::g_color[_flag];
+			proimage.vecImageCon[index - 1].updateColor();
 		}
 	case CV_EVENT_MOUSEMOVE:
 		if (index > 0)
@@ -401,9 +402,15 @@ void ProImage::onMouseHandle(int event, int x, int y, int flags, void* param)
 
 void ProImage::getData(ProImage Temp)		//ProImage类之间传递被选轮廓的index
 {
-	set<int>::iterator iter;
-	for (iter = Temp.chosen.begin(); iter != Temp.chosen.end(); iter++)
-		chosen.insert(*iter);
+	//set<int>::iterator iter;
+	//for (iter = Temp.chosen.begin(); iter != Temp.chosen.end(); iter++)
+	//	chosen.insert(*iter);
+	CV_Assert(Temp.vecImageCon.size() == this->vecImageCon.size());
+	for (int i = 0; i < this->vecImageCon.size(); i++)
+	{
+		this->vecImageCon[i].flag = Temp.vecImageCon[i].flag;
+		this->vecImageCon[i].updateColor();
+	}
 }
 
 void ProImage::printContour()			//提取实验用图的代码

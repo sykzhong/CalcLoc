@@ -36,3 +36,8 @@ void ImageCon::fitContour()
 		break;
 	}
 }
+
+void ImageCon::updateColor()
+{
+	color = g_color[flag];
+}

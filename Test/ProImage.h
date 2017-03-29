@@ -25,8 +25,6 @@ public:
 	void lowlightImage(const int &_selectindex);			//对用户脱离选择的轮廓恢复低亮显示
 	void fitContour();										//根据用户操作情况对轮廓进行重新拟合
 
-	
-
 	void getData(ProImage Temp);							//用于将模板数据传递至dst
 	void printContour();
 

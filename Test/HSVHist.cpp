@@ -39,7 +39,6 @@ int HSVHist::getImage(string path)
 
 void HSVHist::Init()
 {
-	//medianBlur(m_image, m_image, 3);
 	getHist();
 	drawHist();
 }
@@ -78,7 +77,7 @@ void HSVHist::drawHist()
 			
 			rectangle(hist_img, Point(loc*bin_w, hist_h), Point((loc + 1)*bin_w, hist_h - binval), color, -1);
 		}
-	imshow(path, hist_img);
+	//imshow(path, hist_img);
 }
 
 void HSVHist::removeSeg(HSVHist back)
