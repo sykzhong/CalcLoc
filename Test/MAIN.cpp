@@ -5,7 +5,7 @@
 #include <fstream>
 #include <stdio.h>
 #include <time.h>
-#define TEST4
+#define TEST1
 int main()
 {
 #ifdef SINGLE
@@ -112,7 +112,7 @@ int main()
 	waitKey(0);
 	return 0;
 #elif defined TEST1
-	string strfore = "1.bmp", strback = "1.bmp";
+	string strfore = "4.bmp", strback = "1.bmp";
 	HSVHist src, back;
 	src.getImage(strfore);
 	back.getImage(strback);
@@ -127,7 +127,7 @@ int main()
 	src.showImage();
 	waitKey(0);
 	return 0;
-#elif defined TEST2
+#elif defined TEST2					//HSV色阶去除
 	string strfore = "4.bmp", strback = "1.bmp";
 	ProImage src, back;
 	src.getImage(strfore);
@@ -147,7 +147,7 @@ int main()
 
 	waitKey(0);
 	return 0;
-#elif defined TEST3
+#elif defined TEST3				//轮廓分类，单图定位
 	string strfore = "4.bmp", strback = "1.bmp";
 	CalcLoc src, back;
 	src.getImage(strfore);
@@ -185,7 +185,7 @@ int main()
 
 	waitKey(0);
 	return 0;
-#elif defined TEST4
+#elif defined TEST4			//轮廓分选、模板匹配的多图位置搜索
 	CalcLoc Temp, Dst;
 	HSVHist Back;
 	string strpBack = "back.bmp", strpTemp = "wp_000.bmp", strpDst = "wp_";

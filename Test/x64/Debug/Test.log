@@ -1,10 +1,5 @@
 ﻿C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V140\Microsoft.CppBuild.targets(392,5): warning MSB8028: The intermediate directory (x64\Debug\) contains files shared from another project (Test.vcxproj).  This can lead to incorrect clean and rebuild behavior.
-  ProImage.cpp
-e:\cloud\research\vision\test\test\proimage.cpp(248): warning C4244: “=”: 从“double”转换到“uchar”，可能丢失数据
   HSVHist.cpp
-e:\cloud\research\vision\test\test\hsvhist.cpp(57): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
-e:\cloud\research\vision\test\test\hsvhist.cpp(78): warning C4244: “参数”: 从“float”转换到“int”，可能丢失数据
-  CalcLoc.cpp
-e:\cloud\research\vision\test\test\calcloc.cpp(43): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
-  正在生成代码...
+e:\cloud\research\vision\test\test\hsvhist.cpp(80): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
+e:\cloud\research\vision\test\test\hsvhist.cpp(122): warning C4244: “参数”: 从“float”转换到“int”，可能丢失数据
   Test.vcxproj -> E:\Cloud\Research\Vision\Test\x64\Debug\CalcLoc.exe
