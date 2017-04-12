@@ -26,14 +26,16 @@ void ProImage::reset()
 
 void ProImage::preproImage()
 {
-	//int morph_elem = 0;		//Element:\n 0: Rect - 1: Cross - 2: Ellipse
-	//int morph_size = 3;
-	//Mat element = getStructuringElement(morph_elem, Size(2 * morph_size + 1, 2 * morph_size + 1), Point(morph_size, morph_size));
-	//dilate(m_image, m_image, element, Point(-1, -1), 1);
-	//erode(m_image, m_image, element, Point(-1, -1), 1);
-
-	//medianBlur(m_image, m_image, 5);
-
+	/****对于外圈轮廓，先腐蚀去掉剔除不干净的轮廓，再使用膨胀将轮廓胀满整个工件，效果佳***/
+	int morph_elem = 0;		//Element:\n 0: Rect - 1: Cross - 2: Ellipse
+	int morph_size = 3;
+	Mat element = getStructuringElement(morph_elem, Size(2 * morph_size + 1, 2 * morph_size + 1), Point(morph_size, morph_size));
+	erode(m_image, m_image, element, Point(-1, -1), 1);
+	dilate(m_image, m_image, element, Point(-1, -1), 2);
+	
+	medianBlur(m_image, m_image, 3);
+	//GaussianBlur(m_image, m_image, Size(3, 3), 0, 0);
+	//imwrite("houghtest.jpg", m_image);
 
 	
 	//morphologyEx(m_image, m_image, MORPH_OPEN, element);

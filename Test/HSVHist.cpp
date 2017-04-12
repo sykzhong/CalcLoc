@@ -3,7 +3,7 @@
 HSVHist::HSVHist()
 {
 	histsize[0] = 8;		//H通道bin数
-	histsize[1] = 40;		//S通道
+	histsize[1] = 32;		//S通道
 	histsize[2] = 8;		//V通道
 
 	hrange[0] = 0;			//神tmbug，不如此中规中矩地设为180会出错
@@ -15,7 +15,7 @@ HSVHist::HSVHist()
 	for (int i = 1; i < 3; i++)
 		ranges[i] = svrange;		//各通道取值范围
 	
-	bin_w = 6;
+	bin_w = 3;
 	hist_h = 240;
 	hist_w = histsize[0]*histsize[1] *bin_w;	//hs的bin数总和，单格宽为6
 	hist_img = Mat(hist_h, hist_w, CV_8UC3, Scalar::all(0));
@@ -34,6 +34,7 @@ int HSVHist::getImage(string path)
 	this->path = path;
 	m_image = srcimage.clone();
 	cvtColor(m_image, m_image, COLOR_BGR2HSV);
+	//medianBlur(m_image, m_image, 3);
 	return 1;
 }
 
@@ -47,6 +48,7 @@ void HSVHist::getHist()
 {
 	split(m_image, hsvplane);			//通道分离
 	int channels[3] = { 0, 1, 2};
+	//int channels[3] = { 0, 2, 1 };		
 	calcHist(hsvplane, 3, channels, Mat(), hsvhist, 2, histsize, ranges);		//直方图计算
 	//归一化处理
 	minMaxLoc(hsvhist, 0, &maxval, 0, 0);
@@ -72,12 +74,13 @@ void HSVHist::drawHist()
 			
 			//颜色由hsv转换为rgb
 			hsv_color.setTo(Scalar(i*179.f / histsize[0], j*255.f / histsize[1], 255, 0));
+			//hsv_color.setTo(Scalar(i*179.f / histsize[0], 255, j*255.f / histsize[1], 0));		//HV版本
 			cvtColor(hsv_color, rgb_color, COLOR_HSV2BGR);
 			Scalar color = rgb_color.at<Vec3b>(0, 0);
 			
 			rectangle(hist_img, Point(loc*bin_w, hist_h), Point((loc + 1)*bin_w, hist_h - binval), color, -1);
 		}
-	//imshow(path, hist_img);
+	imshow(path, hist_img);
 }
 
 void HSVHist::removeSeg(HSVHist back)
