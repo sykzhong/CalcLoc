@@ -27,7 +27,7 @@ void ProImage::reset()
 void ProImage::preproImage()
 {
 	/****对于外圈轮廓，先腐蚀去掉剔除不干净的轮廓，再使用膨胀将轮廓胀满整个工件，效果佳***/
-	int morph_elem = 0;		//Element:\n 0: Rect - 1: Cross - 2: Ellipse
+	int morph_elem = 2;		//Element:\n 0: Rect - 1: Cross - 2: Ellipse
 	int morph_size = 3;
 	Mat element = getStructuringElement(morph_elem, Size(2 * morph_size + 1, 2 * morph_size + 1), Point(morph_size, morph_size));
 	erode(m_image, m_image, element, Point(-1, -1), 1);
@@ -275,7 +275,15 @@ void ProImage::fitContour()
 	//	}
 	//}
 	for (int i = 0; i < vecImageCon.size(); i++)
+	{
+		if (vecImageCon[i].flag == CON_IGNORE)
+		{
+			vecImageCon.erase(vecImageCon.begin() + i);
+			i--;
+			continue;
+		}
 		vecImageCon[i].fitContour();
+	}
 }
 
 void ProImage::writeResult(string _imgname)		//记录完整的处理结果

@@ -35,9 +35,39 @@ void ImageCon::fitContour()
 		ellipsebox = fitEllipse(pointsf);	
 		break;
 	}
+	if (flag != CON_IGNORE)
+		getCenterTh();
 }
 
 void ImageCon::updateColor()
 {
 	color = g_color[flag];
+}
+
+void ImageCon::getCenterTh()
+{
+	switch (flag)
+	{
+	case CON_POLY:
+		CV_Assert(polycontour.size() >= 1);
+		conmoment = moments(polycontour, false);
+		concenter = Point2f(conmoment.m10 / conmoment.m00, conmoment.m01 / conmoment.m00);
+		conth = 0.5*atan(2 * conmoment.nu11 / (conmoment.nu20 - conmoment.nu02));
+		break;
+	case CON_ELLIPSE:
+		CV_Assert(ellipsebox.size.width != 0);
+		/*直接使用椭圆拟合结果作为中心和角度值*/
+		concenter = ellipsebox.center;
+		conth = ellipsebox.angle;
+		break;
+	case CON_NORMAL:
+		CV_Assert(contour.size() >= 1);
+		conmoment = moments(contour, false);
+		concenter = Point2f(conmoment.m10 / conmoment.m00, conmoment.m01 / conmoment.m00);
+		conth = 0.5*atan(2 * conmoment.nu11 / (conmoment.nu20 - conmoment.nu02));
+		break;
+	case CON_IGNORE:
+		CV_Assert(0);
+	}
+
 }

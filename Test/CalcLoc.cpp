@@ -28,7 +28,12 @@ void CalcLoc::getHUMoment()
 
 void CalcLoc::getCenter()
 {
-	this->getHUMoment();
+	/*将被选中轮廓的中心进行累加求平均值作为工件中心*/
+
+	for (int i = 0; i < vecImageCon.size(); i++)
+		m_center += vecImageCon[i].concenter;
+	m_center /= (double)vecImageCon.size();
+	/*this->getHUMoment();
 	m_center = Point2f(0, 0);
 	m_Ecenter.clear();
 	m_Pcenter.clear();
@@ -43,7 +48,7 @@ void CalcLoc::getCenter()
 		m_Pcenter.push_back(Point2f(vecmu[i].m10 / vecmu[i].m00, vecmu[i].m01 / vecmu[i].m00));
 		m_center += m_Pcenter.back();
 	}
-	m_center /= (float)(m_Pcenter.size() + m_Ecenter.size());
+	m_center /= (float)(m_Pcenter.size() + m_Ecenter.size());*/
 
 	/*this->getHUMoment();
 	m_Pcenter.resize(vecpoly.size());

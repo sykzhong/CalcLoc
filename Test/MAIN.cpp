@@ -5,7 +5,7 @@
 #include <fstream>
 #include <stdio.h>
 #include <time.h>
-#define TEST1
+#define TEST3
 int main()
 {
 #ifdef SINGLE
@@ -112,8 +112,8 @@ int main()
 	waitKey(0);
 	return 0;
 #elif defined TEST1
-	string strfore = "4.bmp", strback = "1.bmp";
-	HSVHist src, back;
+	string strfore = "2.bmp", strback = "1.bmp";
+	ProImage src, back;
 	src.getImage(strfore);
 	back.getImage(strback);
 
@@ -124,6 +124,7 @@ int main()
 	back.drawHist();
 
 	src.removeSeg(back);
+	src.preproImage();
 	src.showImage();
 	waitKey(0);
 	return 0;
