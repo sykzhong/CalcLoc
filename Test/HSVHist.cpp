@@ -26,6 +26,51 @@ HSVHist::~HSVHist()
 
 }
 
+void HSVHist::Split(const Mat& src, Mat* mv, Mat &mask)
+{
+	int nChannels = src.channels();
+	int nRows = src.rows;
+	int nCols = src.cols;
+	uchar **splitChannels = new uchar*[3];
+	//vector<vector<uchar>> splitChannels(nChannels);
+	if (src.isContinuous())
+	{
+		nCols *= nRows;
+		nRows = 1;
+	}
+	const uchar *p;		//指代src的行指针
+	uchar *q;			//指代mask的行指针
+	/*用于存储HSV三通道的值*/
+	uchar *data1 = new uchar[nRows*nCols];			
+	uchar *data2 = new uchar[nRows*nCols];
+	uchar *data3 = new uchar[nRows*nCols];
+	int index = 0;		//用于记录三通道的末下标
+
+	for (int i = 0; i < nRows; i++)
+	{
+		for (int j = 0; j < nCols; j++)
+		{
+			p = src.ptr<uchar>(i);
+			q = mask.ptr<uchar>(i);
+			if (q[j*nChannels] != 0)
+			{
+				data1[index] = p[j*nChannels + 0];
+				data2[index] = p[j*nChannels + 1];
+				data3[index] = p[j*nChannels + 2];
+				index++;
+			}
+			/*for (k = 0; k < nChannels; k++)
+				splitChannels[k].push_back(p[j*nChannels + k]);*/
+		}
+
+	}
+	mv[0] = Mat(1, index, CV_8UC1, data1);
+	mv[1] = Mat(1, index, CV_8UC1, data2);
+	mv[2] = Mat(1, index, CV_8UC1, data3);
+	//for (k = 0; k < nChannels; k++)
+	//	mv[k] = Mat(1, splitChannels[k].size(), CV_8UC1);
+}
+
 int HSVHist::getImage(string path)
 {
 	srcimage = imread(path, 1);
@@ -44,9 +89,16 @@ void HSVHist::Init()
 	drawHist();
 }
 
-void HSVHist::getHist()
+void HSVHist::getHist(Mat &mask)
 {
-	split(m_image, hsvplane);			//通道分离
+	if (mask.empty())
+		split(m_image, hsvplane);			//通道分离
+	else
+	{
+		Split(m_image, hsvplane, mask);
+	}
+		
+	//split(m_image, hsvplane);			//通道分离
 	int channels[3] = { 0, 1, 2};
 	//int channels[3] = { 0, 2, 1 };		
 	calcHist(hsvplane, 3, channels, Mat(), hsvhist, 2, histsize, ranges);		//直方图计算

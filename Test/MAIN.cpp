@@ -5,7 +5,7 @@
 #include <fstream>
 #include <stdio.h>
 #include <time.h>
-#define TEST3
+#define TEST1
 int main()
 {
 #ifdef SINGLE
@@ -113,6 +113,9 @@ int main()
 	return 0;
 #elif defined TEST1
 	string strfore = "2.bmp", strback = "1.bmp";
+	Mat mask = imread("2syk.jpg", 0);
+	threshold(mask, mask, 254, 255, THRESH_BINARY_INV);
+
 	ProImage src, back;
 	src.getImage(strfore);
 	back.getImage(strback);
@@ -120,7 +123,7 @@ int main()
 	src.getHist();
 	src.drawHist();
 
-	back.getHist();
+	back.getHist(mask);
 	back.drawHist();
 
 	src.removeSeg(back);

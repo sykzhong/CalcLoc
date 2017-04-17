@@ -13,12 +13,13 @@ public:
 	HSVHist();
 	~HSVHist();
 	int getImage(string path);
-	void getHist();
+	void getHist(Mat &mask = Mat());
 	void drawHist();
 	void removeSeg(HSVHist back);
 	static void removeBack(HSVHist dst, HSVHist back);
 	void showImage(string strpath = "");
 	void Init();
+	void Split(const Mat& src, Mat* mv, Mat &mask);			//带掩码的split函数，分解所得的通道mat行数为1，用于背景图像
 private:
 	Mat hsvplane[3];		//存储HSV三通道
 	
@@ -38,6 +39,7 @@ protected:
 	Mat m_image;
 	Mat hsvhist;			//用于存储直方图计算结果
 	int histsize[3];		//hsv在直方图中分布数
+
 };
 
 
