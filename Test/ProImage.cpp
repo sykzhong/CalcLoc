@@ -44,6 +44,10 @@ void ProImage::preproImage()
 
 void ProImage::getContour()
 {
+	//dubug用
+	sykcheck = srcimage.clone();
+	cvtColor(sykcheck, sykcheck, CV_BGR2HSV);
+
 	this->preproImage();			//预处理
 	Mat conimage;
 	cvtColor(m_image, conimage, CV_BGR2GRAY);
@@ -381,6 +385,7 @@ void ProImage::onMouseHandle(int event, int x, int y, int flags, void* param)
 			break;
 		}
 	}
+	
 	switch (event)
 	{
 	case CV_EVENT_LBUTTONDOWN:		//左键单击，则对所选轮廓的颜色、状态进行相应更改
@@ -393,6 +398,7 @@ void ProImage::onMouseHandle(int event, int x, int y, int flags, void* param)
 			proimage.vecImageCon[index - 1].updateColor();
 		}
 	case CV_EVENT_MOUSEMOVE:
+		cout << proimage.sykcheck.at<Vec3b>(y, x) << endl;
 		if (index > 0)
 		{
 			proimage.highlightImage(index - 1);

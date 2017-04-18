@@ -5,9 +5,15 @@
 #include <fstream>
 #include <stdio.h>
 #include <time.h>
-#define TEST1
+#define TEST3
+
+INITIALIZE_EASYLOGGINGPP
+
 int main()
 {
+	Configurations conf("my-conf.conf");
+	Loggers::reconfigureLogger("default", conf);
+	LOG(TRACE) << "Begin";
 #ifdef SINGLE
 	string srcpath = "4.bmp";
 	string backpath = "1.bmp";
@@ -112,9 +118,11 @@ int main()
 	waitKey(0);
 	return 0;
 #elif defined TEST1
-	string strfore = "2.bmp", strback = "1.bmp";
+	string strfore = "2.bmp", strback = "2b.bmp";
 	Mat mask = imread("2syk.jpg", 0);
-	threshold(mask, mask, 254, 255, THRESH_BINARY_INV);
+	threshold(mask, mask, 254, 255, THRESH_BINARY);
+	imshow("mask", mask);
+	Mat fmask = Mat(mask.size(), CV_8UC1, Scalar::all(255));
 
 	ProImage src, back;
 	src.getImage(strfore);
@@ -124,10 +132,11 @@ int main()
 	src.drawHist();
 
 	back.getHist(mask);
+	//back.getHist();
 	back.drawHist();
 
 	src.removeSeg(back);
-	src.preproImage();
+	//src.preproImage();
 	src.showImage();
 	waitKey(0);
 	return 0;
@@ -152,11 +161,18 @@ int main()
 	waitKey(0);
 	return 0;
 #elif defined TEST3
-	string strfore = "3.bmp", strback = "1.bmp";
+	string strfore = "4.bmp", strback = "1.bmp";
 	CalcLoc src, back;
 	src.getImage(strfore);
 	back.getImage(strback);
-	HSVHist::removeBack(src, back);
+	Mat mask = imread("2syk.jpg", 0);
+	threshold(mask, mask, 254, 255, THRESH_BINARY_INV);
+	src.getHist();
+	back.getHist();
+	src.drawHist();
+	back.drawHist();
+	src.removeSeg(back);
+	//HSVHist::removeBack(src, back);
 	//src.HSVHist::showImage();
 
 	src.getContour();

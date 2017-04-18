@@ -7,9 +7,11 @@
 #include <vector>
 #include <iostream>  
 #include <stdio.h>
+#include <easylogging++.h>
 
 using namespace cv;
 using namespace std;
+using namespace el;
 
 static const Scalar RED = Scalar(0, 0, 255);
 static const Scalar PINK = Scalar(230, 130, 255);

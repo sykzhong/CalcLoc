@@ -33,17 +33,20 @@ void HSVHist::Split(const Mat& src, Mat* mv, Mat &mask)
 	int nCols = src.cols;
 	uchar **splitChannels = new uchar*[3];
 	//vector<vector<uchar>> splitChannels(nChannels);
-	if (src.isContinuous())
-	{
-		nCols *= nRows;
-		nRows = 1;
-	}
+	//if (src.isContinuous())
+	//{
+	//	nCols *= nRows;
+	//	nRows = 1;
+	//}
 	const uchar *p;		//指代src的行指针
 	uchar *q;			//指代mask的行指针
 	/*用于存储HSV三通道的值*/
-	uchar *data1 = new uchar[nRows*nCols];			
+	uchar *data1 = new uchar[nRows*nCols];
 	uchar *data2 = new uchar[nRows*nCols];
 	uchar *data3 = new uchar[nRows*nCols];
+	//int *data1 = new int[nRows*nCols];
+	//int *data2 = new int[nRows*nCols];
+	//int *data3 = new int[nRows*nCols];
 	int index = 0;		//用于记录三通道的末下标
 
 	for (int i = 0; i < nRows; i++)
@@ -52,11 +55,13 @@ void HSVHist::Split(const Mat& src, Mat* mv, Mat &mask)
 		{
 			p = src.ptr<uchar>(i);
 			q = mask.ptr<uchar>(i);
-			if (q[j*nChannels] != 0)
+			//LOG(TRACE) << (int)(q[j*nChannels]);
+			if ((int)(q[j*nChannels]) > 10)
 			{
 				data1[index] = p[j*nChannels + 0];
 				data2[index] = p[j*nChannels + 1];
 				data3[index] = p[j*nChannels + 2];
+				//cout << (int)data2[index] << endl;
 				index++;
 			}
 			/*for (k = 0; k < nChannels; k++)
@@ -64,9 +69,12 @@ void HSVHist::Split(const Mat& src, Mat* mv, Mat &mask)
 		}
 
 	}
+	cout << index << endl;
 	mv[0] = Mat(1, index, CV_8UC1, data1);
 	mv[1] = Mat(1, index, CV_8UC1, data2);
 	mv[2] = Mat(1, index, CV_8UC1, data3);
+	LOG(TRACE) << mv[0];
+
 	//for (k = 0; k < nChannels; k++)
 	//	mv[k] = Mat(1, splitChannels[k].size(), CV_8UC1);
 }
@@ -91,17 +99,20 @@ void HSVHist::Init()
 
 void HSVHist::getHist(Mat &mask)
 {
+	int channels[3] = { 0, 1, 2 };
 	if (mask.empty())
-		split(m_image, hsvplane);			//通道分离
-	else
 	{
-		Split(m_image, hsvplane, mask);
+		split(m_image, hsvplane);			//通道分离
+		calcHist(hsvplane, 2, channels, Mat(), hsvhist, 2, histsize, ranges);		//直方图计算
 	}
 		
-	//split(m_image, hsvplane);			//通道分离
-	int channels[3] = { 0, 1, 2};
-	//int channels[3] = { 0, 2, 1 };		
-	calcHist(hsvplane, 3, channels, Mat(), hsvhist, 2, histsize, ranges);		//直方图计算
+	else
+	{
+		//Split(m_image, hsvplane, mask);
+		split(m_image, hsvplane);
+		calcHist(hsvplane, 2, channels, mask, hsvhist, 2, histsize, ranges);		//直方图计算
+	}
+		
 	//归一化处理
 	minMaxLoc(hsvhist, 0, &maxval, 0, 0);
 	for (int i = 0; i < histsize[0]; i++)
@@ -155,7 +166,7 @@ void HSVHist::removeSeg(HSVHist back)
 			Hval = psrc[j*nChannels]*histsize[0]/180;
 			Sval = psrc[j*nChannels + 1]*histsize[1]/256;
 
-			if (back.hsvhist.at<float>(Hval, Sval) > 0)
+			if (back.hsvhist.at<float>(Hval, Sval) > 4)
 				for (int k = 0; k < 3; k++)
 					psrc[j*nChannels + k] = 0;
 		}

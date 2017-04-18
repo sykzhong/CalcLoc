@@ -27,7 +27,7 @@ void ImageCon::fitContour()
 	switch (flag)
 	{
 	case CON_POLY:
-		approxPolyDP(contour, polycontour, 10, true);
+		approxPolyDP(contour, polycontour, 5, true);
 		break;
 	case CON_ELLIPSE:
 		Mat pointsf;

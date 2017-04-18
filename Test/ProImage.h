@@ -48,7 +48,7 @@ private:
 	int selectindex;					//记录被选择的单个轮廓索引
 	int recoverflag;					//是否复原的标记（显示用）
 
-
+	Mat sykcheck;						//debug 用
 protected:
 	vector<ImageCon> vecImageCon;		//存储所有轮廓信息
 
