@@ -71,12 +71,18 @@ void CalcLoc::writeResult(string _imgname)
 	}
 
 	Point2f tmpcenter = vecImageCon[angleindex].concenter;		//角度基准轮廓中心
-	line(fitresult, Point2f(tmpcenter.x + fitresult.cols, tmpcenter.y + fitresult.cols * tan(m_angle)),
-		Point2f(tmpcenter.x - fitresult.cols, tmpcenter.y - fitresult.cols * tan(m_angle)), LIGHTBLUE, 2);
+	if(abs(abs(m_angle) - PI / 2) > PI/360)
+		line(fitresult, Point2f(tmpcenter.x + fitresult.cols, tmpcenter.y + fitresult.cols * tan(m_angle)),
+			Point2f(tmpcenter.x - fitresult.cols, tmpcenter.y - fitresult.cols * tan(m_angle)), LIGHTBLUE, 2);
+	else
+		line(fitresult, Point2f(tmpcenter.x, 0), Point2f(tmpcenter.x, fitresult.rows), LIGHTBLUE, 2);
 	circle(fitresult, m_center, 3, RED, -1);
 
-	line(fitresult, Point2f(realcenter.x + fitresult.cols, realcenter.y + fitresult.cols * tan(realangle)),
-		Point2f(realcenter.x - fitresult.cols, realcenter.y - fitresult.cols * tan(realangle)), YELLOW, 2);
+	if (abs(abs(realangle) - PI / 2) > PI / 360)
+		line(m_showimage, Point2f(realcenter.x + m_showimage.cols, realcenter.y + m_showimage.cols * tan(realangle)),
+			Point2f(realcenter.x - m_showimage.cols, realcenter.y - m_showimage.cols * tan(realangle)), YELLOW, 2);
+	else
+		line(m_showimage, Point2f(realcenter.x, 0), Point2f(realcenter.x, m_showimage.rows), YELLOW, 2);
 	circle(fitresult, realcenter, 3, ORCHID, -1);
 
 	if (_imgname == "")
@@ -87,9 +93,12 @@ void CalcLoc::writeResult(string _imgname)
 void CalcLoc::showImage(const string &winname)
 {
 	m_showimage = fitresult.clone();
-	
-	line(m_showimage, Point2f(realcenter.x + m_showimage.cols, realcenter.y + m_showimage.cols * tan(realangle)),
-		Point2f(realcenter.x - m_showimage.cols, realcenter.y - m_showimage.cols * tan(realangle)), YELLOW, 2);
+	if (abs(abs(realangle) - PI / 2) > PI / 360)
+		line(m_showimage, Point2f(realcenter.x + m_showimage.cols, realcenter.y + m_showimage.cols * tan(realangle)),
+			Point2f(realcenter.x - m_showimage.cols, realcenter.y - m_showimage.cols * tan(realangle)), YELLOW, 2);
+	else
+		line(m_showimage, Point2f(realcenter.x, 0),	Point2f(realcenter.x, m_showimage.rows), YELLOW, 2);
+
 	circle(m_showimage, realcenter, 3, ORCHID, -1);
 	imshow(winname, m_showimage);
 }
@@ -118,8 +127,11 @@ void CalcLoc::moveCam(int &flag)
 		if (realcenter.y <= TopLeft.y)
 			realcenter.y = TopLeft.y;
 		break;
+		/***realangle的角度范围在[-PI/2, PI/2]***/
 	case ROTATE_CLOCKWISE:
 		realangle += PI / 180;
+		if (realangle > PI / 2)
+			realangle = PI - realangle;		
 		break;
 	case ROTATE_ANTICLOCKWISE:
 		realangle -= PI / 180;
