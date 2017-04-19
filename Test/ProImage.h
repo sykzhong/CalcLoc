@@ -28,6 +28,8 @@ public:
 	void getData(ProImage Temp);							//用于将模板数据传递至dst
 	void printContour();
 
+	void showState();										//在输出窗口输出个轮廓拟合状态以及角度基准编号
+
 	void writeResult(string _imgname = "");					//显示用户操作的最终结果
 
 	static void onMouseHandle(int event, int x, int y, int flags, void* param);
@@ -57,5 +59,6 @@ protected:
 	vector<vector<Point>> vecpoly;		//记录进行多边形拟合的轮廓
 	vector<RotatedRect> vececllipse;	//记录进行椭圆拟合的轮廓
 
+	int angleindex;						//记录作为角度基准的轮廓索引（默认为最大的轮廓0）
 };
 #endif

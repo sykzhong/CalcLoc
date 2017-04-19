@@ -12,6 +12,7 @@ void ImageCon::inputCon(vector<Point> &_contour, const int &_value, const int &_
 	value = _value;
 	thinlinesize = _thinlinesize;
 	copy(_contour.begin(), _contour.end(), contour.begin());
+	angleflag = 0;
 }
 
 void ImageCon::cvtCon2Mat(const Mat &_template)
@@ -58,7 +59,7 @@ void ImageCon::getCenterTh()
 		CV_Assert(ellipsebox.size.width != 0);
 		/*直接使用椭圆拟合结果作为中心和角度值*/
 		concenter = ellipsebox.center;
-		conth = ellipsebox.angle;
+		conth = ellipsebox.angle / 180 * PI - 90;			//ellipsebox.angle为椭圆长轴与y轴负方向的夹角，-90后转换为x轴正方向的夹角
 		break;
 	case CON_NORMAL:
 		CV_Assert(contour.size() >= 1);

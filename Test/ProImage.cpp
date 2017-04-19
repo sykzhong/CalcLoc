@@ -69,33 +69,14 @@ void ProImage::getContour()
 	vecImageCon.resize(veccon.size());
 	for (int i = 0; i < vecImageCon.size(); i++)
 	{
-		vecImageCon[i].inputCon(veccon[i], i + 1, 1, 8, 2);
+		//inputCon(vector<Point> &_contour, const int &_value, const int &_flag, const int &_thicklinesize, const int &_thinlinesize)
+		vecImageCon[i].inputCon(veccon[i], i + 1, 1, 8, 2);			
 		vecImageCon[i].cvtCon2Mat(srcimage);
 	}
+
+	angleindex = 0;
+	vecImageCon[angleindex].angleflag = 1;			//默认将最外层的轮廓作为轮廓角度选择的基准轮廓
 	////////////////////////////////////////
-
-	//r_orgcon.resize(veccon.size());
-	//b_orgcon.resize(veccon.size());
-	////////在conindex中记录轮廓坐标及索引值
-	//for (int i = 0; i < veccon.size(); i++)
-	//{
-	//	drawContours(conindex, veccon, i, Scalar(i + 1), 5);
-	//	///////////////绘制保存红蓝轮廓
-	//	r_orgcon[i] = Mat(m_image.size(), CV_8UC3, Scalar::all(0));
-	//	b_orgcon[i] = Mat(m_image.size(), CV_8UC3, Scalar::all(0));
-	//	drawContours(r_orgcon[i], veccon, i, RED, 2);
-	//	drawContours(b_orgcon[i], veccon, i, BLUE, 2);
-	//	//////////////////////////////
-
-	//	///////////////////试验用存图
-	//	//Mat tmpimg = Mat(m_image.size(), CV_8UC1, Scalar::all(0));;
-	//	//drawContours(tmpimg, veccon, i, Scalar::all(255), 1);
-	//	//string strtmpimg = "tmpimg";
-	//	//strtmpimg += 'a' + i;
-	//	//strtmpimg += ".jpg";
-	//	//imwrite(strtmpimg, tmpimg);
-	//	/////////////////////////////
-	//}
 
 }
 
@@ -124,6 +105,7 @@ void ProImage::initWin()
 	reset();
 	//m_showimage = vecImageCon[0].show_image.clone();
 	imshow(winname, m_showimage);
+	showState();
 }
 
 void ProImage::coverImage(Mat &dst, Mat &img)			//原图像dst上覆盖img
@@ -154,64 +136,18 @@ void ProImage::coverImage(Mat &dst, Mat &img)			//原图像dst上覆盖img
 		}
 }
 
-//void ProImage::showImage()
-//{
-//	vector<Mat>::iterator iter;						//指定特定轮廓容器的迭代器
-//	if (recoverflag == 1)							//轮廓由蓝色（高亮）变为红色（普通）
-//		iter = r_orgcon.begin();
-//	else if(recoverflag == 0)
-//		iter = b_orgcon.begin();
-//	
-//	if (recoverflag == 1 && 
-//		chosen.find(selectindex) != chosen.end())	//防止鼠标滑动过程将已选定轮廓复原为红色
-//		return;
-//
-//	for (int i = 0; i < veccon.size(); i++)
-//		if (i == selectindex)
-//			coverImage(m_showimage, *(iter+i));
-//
-//	imshow(winname, m_showimage);
-//}
-
 void ProImage::highlightImage(const int &_selectindex)
 {
 	ImageCon &src = vecImageCon[_selectindex];
 	drawContours(m_showimage, vector<vector<Point>>(1, src.contour), -1, src.color, src.thicklinesize);
 	imshow(winname, m_showimage);
-	//Mat &img = vecImageCon[_selectindex].value_image;		//单通道
-	//Mat &dst = m_showimage;									//三通道
-	//CV_Assert(dst.size() == img.size() && dst.channels() == 3 && img.channels() == 1);
-	//int pChannels = img.channels();
-	//int qChannels = dst.channels();
-	//int nRows = img.rows;
-	//int nCols = img.cols;
-	//if (img.isContinuous() && dst.isContinuous())
-	//{
-	//	nCols *= nRows;
-	//	nRows = 1;
-	//}
-	//uchar* p;			//记录覆盖在上的图像行指针
-	//uchar* q;			//记录被覆盖的图像行指针
-	//for (int i = 0; i < nRows; i++)
-	//	for (int j = 0; j < nCols; j++)
-	//	{
-	//		p = img.ptr<uchar>(i);
-	//		q = dst.ptr<uchar>(i);
-	//		if (p[j*pChannels] != 0)
-	//		{
-	//			for (int k = 0; k < qChannels; k++)
-	//				q[j*qChannels + k] = vecImageCon[_selectindex].color[k];
-
-	//		}
-	//	}
-	//imshow(winname, dst);
 }
 
 void ProImage::lowlightImage(const int &_selectindex)
 {
 	Mat &img1 = vecImageCon[_selectindex].show_image;
 	Mat &img2 = srcimage;
-	Mat &mask = vecImageCon[_selectindex].value_image;
+	Mat &mask = vecImageCon[_selectindex].value_image;		//粗轮廓
 	Mat &dst = m_showimage;
 	CV_Assert(dst.size() == img1.size() && dst.channels() == 3 && 
 		mask.channels() == 1 && img1.channels() == 3 && img2.channels() == 3);
@@ -260,24 +196,6 @@ void ProImage::lowlightImage(const int &_selectindex)
 
 void ProImage::fitContour()
 {
-	//vecpoly.resize(chosen.size());					//chosen的轮廓数为多边形拟合数目，vecpoly用于存储多边形拟合结果
-	//vececllipse.resize(veccon.size() - vecpoly.size());
-	//int j = 0, k = 0;
-	//for (int i = 0; i < veccon.size(); i++)
-	//{
-	//	if (chosen.find(i) != chosen.end())
-	//	{
-	//		approxPolyDP(veccon[i], vecpoly[j], 10, true);
-	//		j++;
-	//	}
-	//	else
-	//	{
-	//		Mat pointsf;
-	//		Mat(veccon[i]).convertTo(pointsf, CV_32F);
-	//		vececllipse[k] = fitEllipse(pointsf);	//vecellipse用于存储椭圆拟合结果
-	//		k++;
-	//	}
-	//}
 	for (int i = 0; i < vecImageCon.size(); i++)
 	{
 		if (vecImageCon[i].flag == CON_IGNORE)
@@ -292,15 +210,7 @@ void ProImage::fitContour()
 
 void ProImage::writeResult(string _imgname)		//记录完整的处理结果
 {
-	//Mat result = srcimage.clone();
-	//for (int i = 0; i < vecpoly.size(); i++)
-	//	drawContours(result, vecpoly, i, RED, 2);
-	//for(int i = 0; i < vececllipse.size(); i++)
-	//	ellipse(result, vececllipse[i], RED, 2, CV_AA);
-	//if (_imgname == "")
-	//	_imgname = "result.jpg";
-	////imshow(_imgname, result);
-	//imwrite(_imgname, result);
+
 	Mat result = srcimage.clone();
 	for (int i = 0; i < vecImageCon.size(); i++)
 	{
@@ -331,46 +241,6 @@ int ProImage::compArea(vector<Point> first, vector<Point> second)
 	return contourArea(first) > contourArea(second);
 }
 
-
-/////////////////旧的使用红蓝contour的mousehandle
-//void ProImage::onMouseHandle(int event, int x, int y, int flags, void* param)
-//{
-//	ProImage& proimage = *(ProImage*)param;
-//	int index = (int)proimage.conindex.at<uchar>(y, x) - 1;		//轮廓索引值，负值表示无轮廓
-//	switch (event)
-//	{
-//	case CV_EVENT_LBUTTONDOWN:
-//		if (index >= 0)
-//		{
-//			if (proimage.chosen.find(index) != proimage.chosen.end())
-//				proimage.chosen.erase(index);
-//			else
-//				proimage.chosen.insert(index);
-//			proimage.showImage();
-//		}
-//	case CV_EVENT_MOUSEMOVE:
-//		if (index >= 0)
-//		{
-//			if (proimage.selectindex == -1)
-//			{
-//				proimage.selectindex = index;
-//				proimage.recoverflag = 0;
-//				proimage.showImage();
-//			}
-//		}
-//		else
-//		{
-//			if (proimage.selectindex != -1)
-//			{
-//				proimage.recoverflag = 1;
-//				proimage.showImage();
-//				proimage.selectindex = -1;
-//			}
-//		}
-//		break;
-//	}
-//}
-
 void ProImage::onMouseHandle(int event, int x, int y, int flags, void* param)
 {
 	ProImage& proimage = *(ProImage*)param;
@@ -397,8 +267,10 @@ void ProImage::onMouseHandle(int event, int x, int y, int flags, void* param)
 				_flag = 0;
 			proimage.vecImageCon[index - 1].updateColor();
 		}
+		proimage.showState();
+		break;
 	case CV_EVENT_MOUSEMOVE:
-		cout << proimage.sykcheck.at<Vec3b>(y, x) << endl;
+		//cout << proimage.sykcheck.at<Vec3b>(y, x) << endl;
 		if (index > 0)
 		{
 			proimage.highlightImage(index - 1);
@@ -413,14 +285,24 @@ void ProImage::onMouseHandle(int event, int x, int y, int flags, void* param)
 			}
 		}
 		break;
+	case CV_EVENT_RBUTTONDOWN:
+		if (index > 0)
+		{
+			if (index - 1 != proimage.angleindex)
+			{
+				/***更新proimage的angleindex***/
+				proimage.vecImageCon[proimage.angleindex].angleflag = 0;
+				proimage.angleindex = index - 1;
+				proimage.vecImageCon[proimage.angleindex].angleflag = 1;
+			}
+			break;
+		}
+		proimage.showState();
 	}
 }
 
 void ProImage::getData(ProImage Temp)		//ProImage类之间传递被选轮廓的index
 {
-	//set<int>::iterator iter;
-	//for (iter = Temp.chosen.begin(); iter != Temp.chosen.end(); iter++)
-	//	chosen.insert(*iter);
 	CV_Assert(Temp.vecImageCon.size() == this->vecImageCon.size());
 	for (int i = 0; i < this->vecImageCon.size(); i++)
 	{
@@ -448,3 +330,37 @@ void ProImage::printContour()			//提取实验用图的代码
 		}
 	}
 }
+
+void ProImage::showState()
+{
+	//CvFont font;
+	//double hscale = 1.0;
+	//double vscale = 1.0;
+	//int linewidth = 2;
+	//cvInitFont(&font, CV_FONT_HERSHEY_SIMPLEX | CV_FONT_ITALIC, hscale, vscale, 0, linewidth);
+	//Scalar textColor = RED;
+	system("CLS");
+	for (int i = 0; i < vecImageCon.size(); i++)
+	{
+		printf("vecImageCon[%d] state:\n", i);
+		switch (vecImageCon[i].flag)
+		{
+		case CON_NORMAL:
+			printf("Fitting state: CON_NORMAL\n");
+			break;
+		case CON_ELLIPSE:
+			printf("Fitting state: CON_ELLIPSE\n");
+			break;
+		case CON_POLY:
+			printf("Fitting state: CON_POLY\n");
+			break;
+		case CON_IGNORE:
+			printf("Fitting state: CON_IGNORE\n");
+			break;
+		}
+		printf("*****************************\n");
+	}
+	printf("Standard angle index is: %d\n", angleindex);
+	//printf("*****************************\n");
+}
+

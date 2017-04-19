@@ -100,18 +100,8 @@ void HSVHist::Init()
 void HSVHist::getHist(Mat &mask)
 {
 	int channels[3] = { 0, 1, 2 };
-	if (mask.empty())
-	{
-		split(m_image, hsvplane);			//通道分离
-		calcHist(hsvplane, 2, channels, Mat(), hsvhist, 2, histsize, ranges);		//直方图计算
-	}
-		
-	else
-	{
-		//Split(m_image, hsvplane, mask);
-		split(m_image, hsvplane);
-		calcHist(hsvplane, 2, channels, mask, hsvhist, 2, histsize, ranges);		//直方图计算
-	}
+	split(m_image, hsvplane);
+	calcHist(hsvplane, 2, channels, mask, hsvhist, 2, histsize, ranges);
 		
 	//归一化处理
 	minMaxLoc(hsvhist, 0, &maxval, 0, 0);
