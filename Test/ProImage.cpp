@@ -294,10 +294,10 @@ void ProImage::onMouseHandle(int event, int x, int y, int flags, void* param)
 				proimage.vecImageCon[proimage.angleindex].angleflag = 0;
 				proimage.angleindex = index - 1;
 				proimage.vecImageCon[proimage.angleindex].angleflag = 1;
+				proimage.showState();
 			}
 			break;
 		}
-		proimage.showState();
 	}
 }
 

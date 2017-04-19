@@ -32,9 +32,11 @@ public:
 
 	int flag;				//用于记录轮廓处理状态，0：忽略 1：不变 2：先多边形后Hu 3：先椭圆后Hu
 	int angleflag;			//用于记录是否作为角度判断的轮廓
+
 	Moments conmoment;		//记录轮廓的Hu轮廓矩（拟合操作后）
 	Point2f concenter;		//轮廓的中心
-	double conth;			//轮廓的绝对角度(与x轴正方向的夹角)
+	double conth;			//轮廓的绝对弧度(与x轴正方向的夹角)
+	double conth_degrees;	//以角度显示轮廓角度（方便查看）
 
 	RotatedRect ellipsebox;					//记录椭圆拟合结果
 	vector<Point> polycontour;				//记录多边形拟合结果

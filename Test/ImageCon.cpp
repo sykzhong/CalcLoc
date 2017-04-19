@@ -54,12 +54,14 @@ void ImageCon::getCenterTh()
 		conmoment = moments(polycontour, false);
 		concenter = Point2f(conmoment.m10 / conmoment.m00, conmoment.m01 / conmoment.m00);
 		conth = 0.5*atan(2 * conmoment.nu11 / (conmoment.nu20 - conmoment.nu02));
+		conth_degrees = conth / PI * 180;
 		break;
 	case CON_ELLIPSE:
 		CV_Assert(ellipsebox.size.width != 0);
 		/*直接使用椭圆拟合结果作为中心和角度值*/
 		concenter = ellipsebox.center;
-		conth = ellipsebox.angle / 180 * PI - 90;			//ellipsebox.angle为椭圆长轴与y轴负方向的夹角，-90后转换为x轴正方向的夹角
+		conth = (ellipsebox.angle - 90) / 180 * PI;				//ellipsebox.angle为椭圆长轴与y轴负方向的夹角，-90后转换为x轴正方向的夹角
+		conth_degrees = conth / PI * 180;
 		break;
 	case CON_NORMAL:
 		CV_Assert(contour.size() >= 1);

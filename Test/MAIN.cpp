@@ -161,7 +161,7 @@ int main()
 	waitKey(0);
 	return 0;
 #elif defined TEST3
-	string strfore = "3.bmp", strback = "1.bmp";
+	string strfore = "3_stretch.bmp", strback = "1.bmp";
 	CalcLoc src, back;
 	src.getImage(strfore);
 	back.getImage(strback);
@@ -196,6 +196,7 @@ int main()
 		}
 	}
 	src.getCenter();
+	src.getAngle();
 	src.writeResult();
 	
 
