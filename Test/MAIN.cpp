@@ -165,14 +165,14 @@ int main()
 	CalcLoc src, back;
 	src.getImage(strfore);
 	back.getImage(strback);
-	Mat mask = imread("2syk.jpg", 0);
-	threshold(mask, mask, 254, 255, THRESH_BINARY_INV);
-	src.getHist();
-	back.getHist();
-	src.drawHist();
-	back.drawHist();
-	src.removeSeg(back);
-	//HSVHist::removeBack(src, back);
+	//Mat mask = imread("2syk.jpg", 0);
+	//threshold(mask, mask, 254, 255, THRESH_BINARY_INV);
+	//src.getHist();
+	//back.getHist();
+	//src.drawHist();
+	//back.drawHist();
+	//src.removeSeg(back);
+	HSVHist::removeBack(src, back);
 	//src.HSVHist::showImage();
 
 	src.getContour();
@@ -198,8 +198,9 @@ int main()
 	}
 	src.getCenter();
 	src.getAngle();
-	src.writeResult();
 	src.getFetchCenterAngle(winname);
+	src.writeResult();
+	src.affineNegTrans();
 	//string winname = "test";
 	//src.setImageWin(winname);
 	//src.showImage();

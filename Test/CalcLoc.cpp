@@ -1,5 +1,9 @@
 #include "stdafx.h"
 #include "CalcLoc.h"
+
+Point2f CalcLoc::compcenter = Point2f(0, 0);
+double CalcLoc::compangle = 0;
+
 CalcLoc::CalcLoc():
 	moveratio(0.01)
 {
@@ -68,9 +72,13 @@ void CalcLoc::writeResult(string _imgname)
 
 	Point2f tmpcenter = vecImageCon[angleindex].concenter;		//角度基准轮廓中心
 	line(fitresult, Point2f(tmpcenter.x + fitresult.cols, tmpcenter.y + fitresult.cols * tan(m_angle)),
-		Point2f(tmpcenter.x - fitresult.cols, tmpcenter.y - fitresult.cols * tan(m_angle)), PINK, 2);
-
+		Point2f(tmpcenter.x - fitresult.cols, tmpcenter.y - fitresult.cols * tan(m_angle)), LIGHTBLUE, 2);
 	circle(fitresult, m_center, 3, RED, -1);
+
+	line(fitresult, Point2f(realcenter.x + fitresult.cols, realcenter.y + fitresult.cols * tan(realangle)),
+		Point2f(realcenter.x - fitresult.cols, realcenter.y - fitresult.cols * tan(realangle)), YELLOW, 2);
+	circle(fitresult, realcenter, 3, ORCHID, -1);
+
 	if (_imgname == "")
 		_imgname = "result.jpg";
 	imwrite(_imgname, fitresult);
@@ -80,9 +88,9 @@ void CalcLoc::showImage(const string &winname)
 {
 	m_showimage = fitresult.clone();
 	
-	line(m_showimage, Point2f(compcenter.x + m_showimage.cols, compcenter.y + m_showimage.cols * tan(compangle)),
-		Point2f(compcenter.x - m_showimage.cols, compcenter.y - m_showimage.cols * tan(compangle)), YELLOW, 2);
-	circle(m_showimage, compcenter, 3, ORCHID, -1);
+	line(m_showimage, Point2f(realcenter.x + m_showimage.cols, realcenter.y + m_showimage.cols * tan(realangle)),
+		Point2f(realcenter.x - m_showimage.cols, realcenter.y - m_showimage.cols * tan(realangle)), YELLOW, 2);
+	circle(m_showimage, realcenter, 3, ORCHID, -1);
 	imshow(winname, m_showimage);
 }
 
@@ -91,30 +99,30 @@ void CalcLoc::moveCam(int &flag)
 	switch (flag)
 	{
 	case MOVE_RIGHT:
-		compcenter.x += fitresult.cols*moveratio;
-		if (compcenter.x >= TopRight.x)
-			compcenter.x = TopRight.x;
+		realcenter.x += fitresult.cols*moveratio;
+		if (realcenter.x >= TopRight.x)
+			realcenter.x = TopRight.x;
 		break;
 	case MOVE_LEFT:
-		compcenter.x -= fitresult.cols*moveratio;
-		if (compcenter.x <= TopLeft.x)
-			compcenter.x = TopLeft.x;
+		realcenter.x -= fitresult.cols*moveratio;
+		if (realcenter.x <= TopLeft.x)
+			realcenter.x = TopLeft.x;
 		break;
 	case MOVE_DOWN:
-		compcenter.y += fitresult.rows*moveratio;
-		if (compcenter.y >= BottomLeft.y)
-			compcenter.y = BottomLeft.y;
+		realcenter.y += fitresult.rows*moveratio;
+		if (realcenter.y >= BottomLeft.y)
+			realcenter.y = BottomLeft.y;
 		break;
 	case MOVE_UP:
-		compcenter.y -= fitresult.rows*moveratio;
-		if (compcenter.y <= TopLeft.y)
-			compcenter.y = TopLeft.y;
+		realcenter.y -= fitresult.rows*moveratio;
+		if (realcenter.y <= TopLeft.y)
+			realcenter.y = TopLeft.y;
 		break;
 	case ROTATE_CLOCKWISE:
-		compangle += PI / 180;
+		realangle += PI / 180;
 		break;
 	case ROTATE_ANTICLOCKWISE:
-		compangle -= PI / 180;
+		realangle -= PI / 180;
 		break;
 	default:
 		break;
@@ -127,8 +135,8 @@ void CalcLoc::Init()
 	TopLeft = Point(0, 0);
 	BottomLeft = Point(0, fitresult.rows);
 	BottomRight = Point(fitresult.cols, fitresult.rows);
-	compcenter = m_center;
-	compangle = m_angle;
+	realcenter = m_center;
+	realangle = m_angle;
 	moveratio = 0.005;
 }
 
@@ -169,3 +177,32 @@ int CalcLoc::getFetchCenterAngle(const string &winname)
 		showImage();
 	}
 }
+
+void CalcLoc::affineNegTrans()
+{
+	/***已知绝对坐标系抓取点、抓取角度，求相对坐标系中相对于工件中心、工件基准角度的值***/
+	Point2f diffcenter = realcenter - m_center;			//绝对坐标系中抓取点与工件中心的差值
+
+	compcenter.x = diffcenter.x*cos(m_angle) + diffcenter.y*sin(m_angle);	//仿射变换
+	compcenter.y = diffcenter.x*-sin(m_angle) + diffcenter.y*cos(m_angle);
+
+	compangle = realangle - m_angle;
+}
+
+void CalcLoc::affinePosTrans()
+{
+	/***已知相对坐标系抓取点、抓取角度，求绝对坐标系中相对于工件中心、工件基准角度的值***/
+	Point2f diffcenter;			//绝对坐标系中抓取点与工件中心的差值
+
+	diffcenter.x = compcenter.x*cos(m_angle) + compcenter.y*-sin(m_angle);
+	diffcenter.y = compcenter.x*sin(m_angle) + compcenter.y*cos(m_angle);
+
+	realcenter = diffcenter + m_center;
+
+	realangle = compangle + m_angle;
+}
+
+//void mapCenterAngle(CalcLoc _template, CalcLoc _target)
+//{
+//	
+//}
