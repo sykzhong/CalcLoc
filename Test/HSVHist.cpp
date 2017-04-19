@@ -3,7 +3,7 @@
 HSVHist::HSVHist()
 {
 	histsize[0] = 8;		//H通道bin数
-	histsize[1] = 32;		//S通道
+	histsize[1] = 48;		//S通道
 	histsize[2] = 8;		//V通道
 
 	hrange[0] = 0;			//神tmbug，不如此中规中矩地设为180会出错
@@ -94,7 +94,7 @@ int HSVHist::getImage(string path)
 void HSVHist::Init()
 {
 	getHist();
-	drawHist();
+	//drawHist();
 }
 
 void HSVHist::getHist(Mat &mask)
@@ -156,7 +156,7 @@ void HSVHist::removeSeg(HSVHist back)
 			Hval = psrc[j*nChannels]*histsize[0]/180;
 			Sval = psrc[j*nChannels + 1]*histsize[1]/256;
 
-			if (back.hsvhist.at<float>(Hval, Sval) > 4)
+			if (back.hsvhist.at<float>(Hval, Sval) > 1)
 				for (int k = 0; k < 3; k++)
 					psrc[j*nChannels + k] = 0;
 		}

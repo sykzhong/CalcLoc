@@ -48,8 +48,10 @@ void CalcLoc::printResult(time_t nowtime)
 		fresult << ctime(&nowtime) << endl;
 }
 
-void CalcLoc::writeResult(string _imgname)
+void CalcLoc::getFitResult()
 {
+	getCenter();
+	getAngle();
 	fitresult = srcimage.clone();
 	for (int i = 0; i < vecImageCon.size(); i++)
 	{
@@ -69,20 +71,53 @@ void CalcLoc::writeResult(string _imgname)
 			break;
 		}
 	}
-
 	Point2f tmpcenter = vecImageCon[angleindex].concenter;		//角度基准轮廓中心
-	if(abs(abs(m_angle) - PI / 2) > PI/360)
+
+	if (abs(abs(m_angle) - PI / 2) > PI / 360)
 		line(fitresult, Point2f(tmpcenter.x + fitresult.cols, tmpcenter.y + fitresult.cols * tan(m_angle)),
 			Point2f(tmpcenter.x - fitresult.cols, tmpcenter.y - fitresult.cols * tan(m_angle)), LIGHTBLUE, 2);
 	else
 		line(fitresult, Point2f(tmpcenter.x, 0), Point2f(tmpcenter.x, fitresult.rows), LIGHTBLUE, 2);
 	circle(fitresult, m_center, 3, RED, -1);
+}
+
+void CalcLoc::writeResult(string _imgname)
+{
+	//fitresult = srcimage.clone();
+	//for (int i = 0; i < vecImageCon.size(); i++)
+	//{
+	//	ImageCon &src = vecImageCon[i];
+	//	switch (src.flag)
+	//	{
+	//	case CON_IGNORE:
+	//		break;
+	//	case CON_NORMAL:
+	//		drawContours(fitresult, vector<vector<Point>>(1, src.contour), -1, src.color, src.thinlinesize);
+	//		break;
+	//	case CON_POLY:
+	//		drawContours(fitresult, vector<vector<Point>>(1, src.polycontour), -1, src.color, src.thinlinesize);
+	//		break;
+	//	case CON_ELLIPSE:
+	//		ellipse(fitresult, src.ellipsebox, src.color, 2, CV_AA);
+	//		break;
+	//	}
+	//}
+
+	//Point2f tmpcenter = vecImageCon[angleindex].concenter;		//角度基准轮廓中心
+
+	///***增加条件判断，防止出现tan(PI/2)的情况出现***/
+	//if(abs(abs(m_angle) - PI / 2) > PI/360)
+	//	line(fitresult, Point2f(tmpcenter.x + fitresult.cols, tmpcenter.y + fitresult.cols * tan(m_angle)),
+	//		Point2f(tmpcenter.x - fitresult.cols, tmpcenter.y - fitresult.cols * tan(m_angle)), LIGHTBLUE, 2);
+	//else
+	//	line(fitresult, Point2f(tmpcenter.x, 0), Point2f(tmpcenter.x, fitresult.rows), LIGHTBLUE, 2);
+	//circle(fitresult, m_center, 3, RED, -1);
 
 	if (abs(abs(realangle) - PI / 2) > PI / 360)
-		line(m_showimage, Point2f(realcenter.x + m_showimage.cols, realcenter.y + m_showimage.cols * tan(realangle)),
-			Point2f(realcenter.x - m_showimage.cols, realcenter.y - m_showimage.cols * tan(realangle)), YELLOW, 2);
+		line(fitresult, Point2f(realcenter.x + fitresult.cols, realcenter.y + fitresult.cols * tan(realangle)),
+			Point2f(realcenter.x - fitresult.cols, realcenter.y - fitresult.cols * tan(realangle)), YELLOW, 2);
 	else
-		line(m_showimage, Point2f(realcenter.x, 0), Point2f(realcenter.x, m_showimage.rows), YELLOW, 2);
+		line(fitresult, Point2f(realcenter.x, 0), Point2f(realcenter.x, fitresult.rows), YELLOW, 2);
 	circle(fitresult, realcenter, 3, ORCHID, -1);
 
 	if (_imgname == "")
@@ -150,6 +185,7 @@ void CalcLoc::Init()
 	realcenter = m_center;
 	realangle = m_angle;
 	moveratio = 0.005;
+	
 }
 
 int CalcLoc::getFetchCenterAngle(const string &winname)
@@ -212,6 +248,12 @@ void CalcLoc::affinePosTrans()
 	realcenter = diffcenter + m_center;
 
 	realangle = compangle + m_angle;
+}
+
+void CalcLoc::reset()
+{
+	m_center = Point2f(0, 0);
+	m_angle = 0;
 }
 
 //void mapCenterAngle(CalcLoc _template, CalcLoc _target)

@@ -270,7 +270,7 @@ void ProImage::onMouseHandle(int event, int x, int y, int flags, void* param)
 		proimage.showState();
 		break;
 	case CV_EVENT_MOUSEMOVE:
-		//cout << proimage.sykcheck.at<Vec3b>(y, x) << endl;
+		cout << proimage.sykcheck.at<Vec3b>(y, x) << endl;
 		if (index > 0)
 		{
 			proimage.highlightImage(index - 1);

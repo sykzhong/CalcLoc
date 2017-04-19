@@ -5,7 +5,7 @@
 #include <fstream>
 #include <stdio.h>
 #include <time.h>
-#define TEST3
+#define TEST4
 
 INITIALIZE_EASYLOGGINGPP
 
@@ -118,7 +118,7 @@ int main()
 	waitKey(0);
 	return 0;
 #elif defined TEST1
-	string strfore = "2.bmp", strback = "2b.bmp";
+	string strfore = "wp_000.bmp", strback = "1.bmp";
 	Mat mask = imread("2syk.jpg", 0);
 	threshold(mask, mask, 254, 255, THRESH_BINARY);
 	imshow("mask", mask);
@@ -131,7 +131,7 @@ int main()
 	src.getHist();
 	src.drawHist();
 
-	back.getHist(mask);
+	back.getHist();
 	//back.getHist();
 	back.drawHist();
 
@@ -161,7 +161,7 @@ int main()
 	waitKey(0);
 	return 0;
 #elif defined TEST3
-	string strfore = "3_stretch.bmp", strback = "1.bmp";
+	string strfore = "2.bmp", strback = "1.bmp";
 	CalcLoc src, back;
 	src.getImage(strfore);
 	back.getImage(strback);
@@ -232,13 +232,18 @@ int main()
 		case 'f':
 			endsign = 1;
 			Temp.fitContour();
-			Temp.getCenter();
+			destroyAllWindows();
 			//Temp.writeResult();
 			break;
 		case 'r':
 			Temp.reset();
 		}
 	}
+
+	Temp.getFitResult();
+	Temp.getFetchCenterAngle(winname);
+	Temp.affineNegTrans();
+
 	time_t nowtime;
 	nowtime = time(NULL);
 	CalcLoc::printResult(nowtime);
@@ -256,12 +261,14 @@ int main()
 
 		HSVHist::removeBack(Dst, Back);
 
-		Dst.Init();
+		Dst.reset();
 		Dst.getContour();
 
 		Dst.getData(Temp);
 		Dst.fitContour();
-		Dst.getCenter();
+
+		Dst.getFitResult();
+		Dst.affinePosTrans();
 
 		CalcLoc::printResult(Dst);
 		Dst.writeResult("r" + strpath);
@@ -272,5 +279,4 @@ int main()
 	waitKey(0);
 	return 0;
 #endif
-	
 }
