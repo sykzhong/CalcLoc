@@ -190,6 +190,7 @@ int main()
 			endsign = 1;
 			src.fitContour();
 			src.writeResult();
+			destroyAllWindows();			//去除所有窗口
 			break;
 		case 'r':
 			src.reset();
@@ -198,8 +199,7 @@ int main()
 	src.getCenter();
 	src.getAngle();
 	src.writeResult();
-	
-
+	src.getFetchCenterAngle(winname);
 	//string winname = "test";
 	//src.setImageWin(winname);
 	//src.showImage();

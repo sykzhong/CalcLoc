@@ -1,5 +1,19 @@
 ﻿C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V140\Microsoft.CppBuild.targets(392,5): warning MSB8028: The intermediate directory (x64\Debug\) contains files shared from another project (Test.vcxproj).  This can lead to incorrect clean and rebuild behavior.
-  ImageCon.cpp
-e:\cloud\research\vision\test\test\imagecon.cpp(55): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
-e:\cloud\research\vision\test\test\imagecon.cpp(69): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
+  CalcLoc.cpp
+e:\cloud\research\vision\test\test\calcloc.cpp(70): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
+e:\cloud\research\vision\test\test\calcloc.cpp(71): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
+e:\cloud\research\vision\test\test\calcloc.cpp(83): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
+e:\cloud\research\vision\test\test\calcloc.cpp(84): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
+e:\cloud\research\vision\test\test\calcloc.cpp(94): warning C4244: “+=”: 从“double”转换到“float”，可能丢失数据
+e:\cloud\research\vision\test\test\calcloc.cpp(96): warning C4244: “=”: 从“int”转换到“float”，可能丢失数据
+e:\cloud\research\vision\test\test\calcloc.cpp(99): warning C4244: “-=”: 从“double”转换到“float”，可能丢失数据
+e:\cloud\research\vision\test\test\calcloc.cpp(101): warning C4244: “=”: 从“int”转换到“float”，可能丢失数据
+e:\cloud\research\vision\test\test\calcloc.cpp(104): warning C4244: “+=”: 从“double”转换到“float”，可能丢失数据
+e:\cloud\research\vision\test\test\calcloc.cpp(106): warning C4244: “=”: 从“int”转换到“float”，可能丢失数据
+e:\cloud\research\vision\test\test\calcloc.cpp(109): warning C4244: “-=”: 从“double”转换到“float”，可能丢失数据
+e:\cloud\research\vision\test\test\calcloc.cpp(111): warning C4244: “=”: 从“int”转换到“float”，可能丢失数据
+  正在生成代码...
+  正在编译...
+  MAIN.cpp
+  正在生成代码...
   Test.vcxproj -> E:\Cloud\Research\Vision\Test\x64\Debug\CalcLoc.exe

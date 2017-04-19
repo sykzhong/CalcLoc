@@ -26,21 +26,28 @@ public:
 	~CalcLoc();
 	void getCenter();				//叠加轮廓中心去平均值作为中心
 	void getAngle();				//取角度基准轮廓计算角度
+
 	void writeResult(string _imgname = "");
 	static void printResult(CalcLoc &dst);		
 	static void printResult(time_t nowtime);
-	int getFetchCenterAngle();		//用户自定义抓取点与抓取角度
-	void moveCam(int &flag);		//用户操作移动相机
-	void showImage(string &winname);				//显示用户操作情况
+
+	int getFetchCenterAngle(const string &winname = "result");		//用户自定义抓取点与抓取角度
+	void Init();													//对界面进行初始化
+	void moveCam(int &flag);										//用户操作移动相机
+	void showImage(const string &winname = "result");				//显示用户操作情况
 
 private:
 	Mat fitresult;					//记录拟合结果
+	Mat m_showimage;				//用于实时显示的图像
 
 	Point2f m_center;
 	double m_angle;
 
-	Point2f comPoint;				//绝对坐标系中，用户抓取点与工件中心的相对距离
-	double comAngle;				//绝对坐标系中，用户抓取角度与工件角度的相对差值（以工件角度轴作为基准）
+	Point2f compcenter;				//绝对坐标系中，用户抓取点，默认与工件中心重叠
+	double compangle;				//绝对坐标系中，用户抓取角度，默认与工件基准角度重叠
+	double moveratio;			//坐标移动速率
+
+	Point TopLeft, TopRight, BottomLeft, BottomRight;		//可观测区的四个角点(留作机械手移动极限位置接口)
 };
 #endif
 

@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "CalcLoc.h"
-CalcLoc::CalcLoc()
+CalcLoc::CalcLoc():
+	moveratio(0.01)
 {
 
 }
@@ -66,8 +67,8 @@ void CalcLoc::writeResult(string _imgname)
 	}
 
 	Point2f tmpcenter = vecImageCon[angleindex].concenter;		//角度基准轮廓中心
-	line(fitresult, Point2f(tmpcenter.x + fitresult.cols / 2, tmpcenter.y + fitresult.cols / 2 * tan(m_angle)),
-		Point2f(tmpcenter.x - fitresult.cols / 2, tmpcenter.y - fitresult.cols / 2 * tan(m_angle)), GREEN, 2);
+	line(fitresult, Point2f(tmpcenter.x + fitresult.cols, tmpcenter.y + fitresult.cols * tan(m_angle)),
+		Point2f(tmpcenter.x - fitresult.cols, tmpcenter.y - fitresult.cols * tan(m_angle)), PINK, 2);
 
 	circle(fitresult, m_center, 3, RED, -1);
 	if (_imgname == "")
@@ -75,18 +76,65 @@ void CalcLoc::writeResult(string _imgname)
 	imwrite(_imgname, fitresult);
 }
 
-void CalcLoc::showImage(string &winname)
+void CalcLoc::showImage(const string &winname)
 {
+	m_showimage = fitresult.clone();
 	
+	line(m_showimage, Point2f(compcenter.x + m_showimage.cols, compcenter.y + m_showimage.cols * tan(compangle)),
+		Point2f(compcenter.x - m_showimage.cols, compcenter.y - m_showimage.cols * tan(compangle)), YELLOW, 2);
+	circle(m_showimage, compcenter, 3, ORCHID, -1);
+	imshow(winname, m_showimage);
 }
 
 void CalcLoc::moveCam(int &flag)
 {
-
+	switch (flag)
+	{
+	case MOVE_RIGHT:
+		compcenter.x += fitresult.cols*moveratio;
+		if (compcenter.x >= TopRight.x)
+			compcenter.x = TopRight.x;
+		break;
+	case MOVE_LEFT:
+		compcenter.x -= fitresult.cols*moveratio;
+		if (compcenter.x <= TopLeft.x)
+			compcenter.x = TopLeft.x;
+		break;
+	case MOVE_DOWN:
+		compcenter.y += fitresult.rows*moveratio;
+		if (compcenter.y >= BottomLeft.y)
+			compcenter.y = BottomLeft.y;
+		break;
+	case MOVE_UP:
+		compcenter.y -= fitresult.rows*moveratio;
+		if (compcenter.y <= TopLeft.y)
+			compcenter.y = TopLeft.y;
+		break;
+	case ROTATE_CLOCKWISE:
+		compangle += PI / 180;
+		break;
+	case ROTATE_ANTICLOCKWISE:
+		compangle -= PI / 180;
+		break;
+	default:
+		break;
+	}
 }
 
-int CalcLoc::getFetchCenterAngle()
+void CalcLoc::Init()
 {
+	TopRight = Point(fitresult.cols, 0);
+	TopLeft = Point(0, 0);
+	BottomLeft = Point(0, fitresult.rows);
+	BottomRight = Point(fitresult.cols, fitresult.rows);
+	compcenter = m_center;
+	compangle = m_angle;
+	moveratio = 0.005;
+}
+
+int CalcLoc::getFetchCenterAngle(const string &winname)
+{
+	Init();
 	for (;;)
 	{
 		int c = waitKey(0);
@@ -118,6 +166,6 @@ int CalcLoc::getFetchCenterAngle()
 			break;
 		}
 		moveCam(flag);
-		//showImage();
+		showImage();
 	}
 }
