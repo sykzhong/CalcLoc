@@ -156,7 +156,7 @@ void HSVHist::removeSeg(HSVHist back)
 			Hval = psrc[j*nChannels]*histsize[0]/180;
 			Sval = psrc[j*nChannels + 1]*histsize[1]/256;
 
-			if (back.hsvhist.at<float>(Hval, Sval) > 1)
+			if (back.hsvhist.at<float>(Hval, Sval) > 0)
 				for (int k = 0; k < 3; k++)
 					psrc[j*nChannels + k] = 0;
 		}

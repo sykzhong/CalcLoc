@@ -7,7 +7,7 @@
 #include <vector>
 #include <iostream>  
 #include <stdio.h>
-#include <easylogging++.h>
+#include "easylogging++.h"
 
 using namespace cv;
 using namespace std;

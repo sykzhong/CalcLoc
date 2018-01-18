@@ -5,7 +5,7 @@
 #include <fstream>
 #include <stdio.h>
 #include <time.h>
-#define TEST4
+#define TEST1
 
 INITIALIZE_EASYLOGGINGPP
 
@@ -15,8 +15,10 @@ int main()
 	Loggers::reconfigureLogger("default", conf);
 	LOG(TRACE) << "Begin";
 #ifdef SINGLE
-	string srcpath = "4.bmp";
-	string backpath = "1.bmp";
+	//string srcpath = "4.bmp";
+	//string backpath = "1.bmp";
+	string srcpath = "Pictures//back+fore.jpg";
+	string backpath = "Pictures//back.jpg";
 	CalcLoc src, back;
 	if (!src.getImage(srcpath) || !back.getImage(backpath))
 		return 0;
@@ -49,8 +51,8 @@ int main()
 		}
 	}
 
-	src.getHUMoment();
-	src.getCenter();
+	//src.getHUMoment();
+	//src.getCenter();
 
 	waitKey(0);
 
@@ -118,11 +120,14 @@ int main()
 	waitKey(0);
 	return 0;
 #elif defined TEST1
-	string strfore = "wp_000.bmp", strback = "1.bmp";
-	Mat mask = imread("2syk.jpg", 0);
-	threshold(mask, mask, 254, 255, THRESH_BINARY);
-	imshow("mask", mask);
-	Mat fmask = Mat(mask.size(), CV_8UC1, Scalar::all(255));
+	//string strfore = "wp_000.bmp", strback = "1.bmp";
+
+	string strfore = "Pictures//back+fore.jpg";
+	string strback = "Pictures//back.jpg";
+	//Mat mask = imread("2syk.jpg", 0);
+	//threshold(mask, mask, 254, 255, THRESH_BINARY);
+	//imshow("mask", mask);
+	//Mat fmask = Mat(mask.size(), CV_8UC1, Scalar::all(255));
 
 	ProImage src, back;
 	src.getImage(strfore);
@@ -132,7 +137,6 @@ int main()
 	src.drawHist();
 
 	back.getHist();
-	//back.getHist();
 	back.drawHist();
 
 	src.removeSeg(back);

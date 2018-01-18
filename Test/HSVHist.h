@@ -2,11 +2,6 @@
 #define _HSVHIST_H_
 #include "GlobalHeader.h"
 
-using namespace std;
-using namespace cv;
-
-
-
 class HSVHist
 {
 public:
